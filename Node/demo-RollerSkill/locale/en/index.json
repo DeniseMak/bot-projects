@@ -1,4 +1,14 @@
 {
+    "choose_level": "__Difficulty Level__",
+    "choose_level_ssml": [
+        "Do you want easy questions, hard ones, or a combination of both?"
+    ],
+   "choose_count_questions": "How many %s questions should I ask?",
+    "choose_count_questions_ssml": [
+        "How many questions? Choose a number from 1 to ten."
+    ],
+    "card_subtitle_singular_questions": "of the %(level) questions",
+    "card_subtitle_plural_questions": "chose %(count) %(level) questions",
     "choose_sides": "__Number of Sides__",
     "choose_sides_ssml": [
         "How many sides on the dice?",
@@ -60,6 +70,6 @@
         "oh no. That was horrible.",
         "You can't do better. Oh wait you can."
     ],
-    "help_title": "Roller Options",
-    "help_ssml": "I'm roller, the dice rolling bot. You can say 'roll some dice' or play one of the games I know how to play."
+    "help_title": "Test Options",
+    "help_ssml": "I can give you quiz questions from the US citizenship exam. You can say 'take a test'."
 }
