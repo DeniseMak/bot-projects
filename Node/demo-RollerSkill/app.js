@@ -236,15 +236,22 @@ bot.dialog('TakeTestDialog', function (session, args) {
 
 bot.dialog('AskQuestionDialog', [
     function (session, args) {
+        var debug = 0;
+        if (debug ) {
+            session.say(null, 'Got into Ask Question dialog.');  // DEBUG: Can you hear this? TODO: put question prompt into a card.
+        }
         // get our current index into the question list.
-        session.say(null, 'Got into Ask Question dialog.');  // DEBUG: Can you hear this? TODO: put question prompt into a card.
-
         var current_question_index = session.conversationData.test.current_question_index;
         if (current_question_index < session.conversationData.test.count) { 
             var question = session.conversationData.questions[current_question_index].question;  // TODO: handle undefined question
             console.log('*******\nQuestion #%d is %s. \n*****\n', current_question_index, question); 
             // ask the question
-            builder.Prompts.text(session, question);
+            if (debug) {
+                session.say(question, question);
+                session.say(session.message.text,session.message.text);
+            } 
+              builder.Prompts.text(session, question);
+            
         } else {
             // we don't know where we are in the test, or we're done (ind==count). 
             // So start over?
@@ -260,10 +267,17 @@ bot.dialog('AskQuestionDialog', [
         // session.send('Ok, sounds like your answer was: %s', lastUtterance);
         var textToEcho = sprintf("Ok, sounds like your answer was: %s", lastUtterance);
         session.say(textToEcho, 'good answer', { inputHint: builder.InputHint.ignoringInput });  // TODO: rate answer based on intent score
-        // TODO: put textToEcho in the card to display.
         var officialAnswer = session.conversationData.questions[session.conversationData.test.current_question_index].answer;
         var txtOfficialAnswer = sprintf('The official answer is: %s', officialAnswer);
         session.say(txtOfficialAnswer, txtOfficialAnswer, { inputHint: builder.InputHint.ignoringInput } ); // TODO: put textToEcho in the card to display - So, putting many fields in one card.
+        // TODO: put textToEcho in the card to display.
+        /*****
+         * 
+         * 
+         * 
+         * 
+         */
+
         session.conversationData.test.current_question_index++; // increment count if we got a recognized result.
         // Ask another question 
         session.replaceDialog('AskQuestionDialog');
