@@ -175,7 +175,7 @@ bot.dialog('TakeTestDialog', function (session, args) {
 
         // Render results using a card
         var card = new builder.HeroCard(session)
-            .subtitle(test.count > 1 ? 'card_subtitle_plural_questions' : 'card_subtitle_singular_questions')
+            .subtitle('Ok!') //.subtitle(test.count > 1 ? 'card_subtitle_plural_questions' : 'card_subtitle_singular_questions')
             .buttons([ // these should be for starting the test
                 builder.CardAction.imBack(session, 'repeat', 'Repeat Previous'), // TODO replace buttons
                 builder.CardAction.imBack(session, 'new test', 'New Test')
