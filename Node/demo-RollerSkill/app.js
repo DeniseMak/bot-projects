@@ -115,7 +115,7 @@ bot.dialog('CreateTestDialog', [
         // - The response is already a number.
         var test = session.dialogData.test;
         test.count = results.response;
-
+        // session.conversationData.test.count = test.count;
         /**
          * Play the game we just created.
          * 
@@ -123,7 +123,11 @@ bot.dialog('CreateTestDialog', [
          * one in its place. We can pass arguments to dialogs so we'll pass the
          * 'TakeTestDialog' the test we created.
          */
-        session.replaceDialog('TakeTestDialog', { test: test });
+        // session.replaceDialog('TakeTestDialog', { test: test });
+        test.turns++;
+        test.current_question_index = 0;
+        session.conversationData.test = test;
+        session.replaceDialog('AskQuestionDialog' , { test: test }); 
     }
 ]).triggerAction({ matches: [
     /.*(text|test|exam|interview|quiz|practice)/i,
@@ -243,9 +247,10 @@ bot.dialog('AskQuestionDialog', [
             // we don't know where we are in the test, or we're done (ind==count). 
             // So start over?
             console.log('Index is %d, about to ask for help', current_question_index); 
+
+            // TODO: Display score.
             session.replaceDialog('HelpDialog', {test: session.conversationData.test, msg: 'Do you want another test?'});
         }
-        // BUG - When the else was triggering above, the prompt would fail here, so moved it to inside the if.
     },
     function (session, results) {
 
