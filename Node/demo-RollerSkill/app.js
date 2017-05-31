@@ -225,7 +225,7 @@ bot.dialog('TakeTestDialog', function (session, args) {
         // for 1 to count questions go to AskQuestionDialog ask test.questions_picked
         //for (curr_q = 0; curr_q < test.count; curr_q++) {
         //    session.conversationData.current_question_index = session.conversationData.test.questions_picked[curr_q];
-            session.beginDialog('AskQuestionDialog'); // replaceDialog('PlayGameDialog', { game: game });
+            session.replaceDialog('AskQuestionDialog'); // replaceDialog('PlayGameDialog', { game: game });
         //}
     } else {
         // User started session with "start over" so let's just send them to
@@ -237,6 +237,8 @@ bot.dialog('TakeTestDialog', function (session, args) {
 bot.dialog('AskQuestionDialog', [
     function (session, args) {
         // get our current index into the question list.
+        session.say(null, 'Got into Ask Question dialog.');  // DEBUG: Can you hear this? TODO: put question prompt into a card.
+
         var current_question_index = session.conversationData.test.current_question_index;
         if (current_question_index < session.conversationData.test.count) { 
             var question = session.conversationData.questions[current_question_index].question;  // TODO: handle undefined question
