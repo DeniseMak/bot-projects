@@ -277,7 +277,7 @@ bot.dialog('AskQuestionDialog', [
             console.log('*******\nQuestion #%d is %s. \n*****\n', current_question_index, question); 
             // ask the question
             if (debug) {
-                session.say(question, question);
+                session.say(dbg_question, dbg_question);
                 // session.say(session.message.text,session.message.text);
             } 
               builder.Prompts.text(session, question);
