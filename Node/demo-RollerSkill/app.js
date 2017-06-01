@@ -273,6 +273,7 @@ bot.dialog('AskQuestionDialog', [
         var current_question_index = session.conversationData.test.current_question_index;
         if (current_question_index < session.conversationData.test.count) { 
             var question = session.conversationData.questions[current_question_index].question;  // TODO: handle undefined question
+            var dbg_question = 'debug: ' + question;
             console.log('*******\nQuestion #%d is %s. \n*****\n', current_question_index, question); 
             // ask the question
             if (debug) {
