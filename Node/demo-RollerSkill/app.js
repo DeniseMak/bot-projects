@@ -35,8 +35,11 @@ var bot = new builder.UniversalBot(connector, function (session) {
         {question: 'Where is the Statue of Liberty?', answer: 'New York (Harbor) or Liberty Island'},
         {question: 'Why does the flag have 50 stars?', answer: 'because there are 50 states'},
         {question: 'When do we celebrate Independence Day?', answer: 'July 4'},
-        {question: 'What did Martin Luther King, Jr. do?', answer: 'He fought for civil rights and worked for equality for all Americans'}
+        {question: 'What did Martin Luther King, Jr. do?', answer: 'He fought for civil rights and worked for equality for all Americans'},
+        {question: 'What are two cabinet-level positions', answer: 'Secretary of State, Secretary of Labor'}
+
         ];
+    session.conversationData.turns = 0;
     // Just redirect to our 'HelpDialog'.
     session.replaceDialog('HelpDialog');
 });
@@ -84,8 +87,19 @@ bot.dialog('CreateTestDialog', [
             { value: 'hard', action: { title: 'Hard' }, synonyms: 'hard|hard ones|hard questions' },
             { value: 'both', action: { title: 'Both' }, synonyms: 'both|both kinds|combination' },
         ];
-        builder.Prompts.choice(session, 'choose_level', choices, { 
-            speak: speak(session, 'choose_level_ssml') 
+        var demo = 1;
+        var prompt = '';
+        var spoken_prompt = '';
+        if (demo) {
+            prompt = '__Difficulty Level__';
+            spoken_prompt = 'Do you want easy questions, hard ones, or a combination of both?';
+        } else {
+             prompt = 'choose_level';
+             spoken_prompt = 'choose_level_ssml';
+           
+        }
+        builder.Prompts.choice(session, prompt, choices, { 
+            speak: speak(session, spoken_prompt) 
         });
     },
     function (session, results) {
@@ -93,7 +107,7 @@ bot.dialog('CreateTestDialog', [
         // - The response comes back as a find result with index & entity value matched.
         var test = session.dialogData.test;
         test.level = results.response.entity;  // Question - does this entity have to do with my LUIS model?
-
+        session.conversationData.test = test;
         /**
          * Ask for number of questions to ask.
          * 
@@ -102,9 +116,18 @@ bot.dialog('CreateTestDialog', [
          * - The number prompt lets us pass additional options to say we only want
          *   integers back and what's the min & max value that's allowed.
          */
-        var prompt = session.gettext('choose_count_questions', test.level);
+        var demo = 1;
+        var prompt = '';
+        var spoken_prompt = '';
+        if (demo) {
+            prompt = 'How many questions?';
+            spoken_prompt = 'How many questions? Choose a number from 1 to ten.';
+        } else {
+            prompt = session.gettext('choose_count_questions', test.level);
+            spoken_prompt = 'choose_count_ssml'
+        }
         builder.Prompts.number(session, prompt, {
-            speak: speak(session, 'choose_count_ssml'),
+            speak: speak(session, spoken_prompt),
             minValue: 1,
             maxValue: 10,
             integerOnly: true
@@ -125,6 +148,7 @@ bot.dialog('CreateTestDialog', [
          */
         // session.replaceDialog('TakeTestDialog', { test: test });
         test.turns++;
+        session.conversationData.turns++; 
         test.current_question_index = 0;
         session.conversationData.test = test;
         session.replaceDialog('AskQuestionDialog' , { test: test }); 
@@ -139,6 +163,7 @@ bot.dialog('CreateTestDialog', [
  * session.conversationData so that should the user say "start over" we
  * can just restart the same test.
  */
+/*
 bot.dialog('TakeTestDialog', function (session, args) {
     // Get current or new test structure.
     var test = args.test || session.conversationData.test;
@@ -205,9 +230,7 @@ bot.dialog('TakeTestDialog', function (session, args) {
 
             msg.inputHint(builder.InputHint.ignoringInput);
         }
-         /**
-         * Send card and bots reaction to user. 
-         */
+
             session.send(msg); //.endDialog();
         
 
@@ -233,10 +256,16 @@ bot.dialog('TakeTestDialog', function (session, args) {
         session.replaceDialog('CreateTestDialog');
     }
 }).triggerAction({ matches: /start over| restart | repeat /i });
+*/
 
+/**
+ * Ask the quiz questions in a loop
+ * 
+ * 
+ */
 bot.dialog('AskQuestionDialog', [
     function (session, args) {
-        var debug = 0;
+        var debug = 1;
         if (debug ) {
             session.say(null, 'Got into Ask Question dialog.');  // DEBUG: Can you hear this? TODO: put question prompt into a card.
         }
@@ -248,7 +277,7 @@ bot.dialog('AskQuestionDialog', [
             // ask the question
             if (debug) {
                 session.say(question, question);
-                session.say(session.message.text,session.message.text);
+                // session.say(session.message.text,session.message.text);
             } 
               builder.Prompts.text(session, question);
             
@@ -256,27 +285,60 @@ bot.dialog('AskQuestionDialog', [
             // we don't know where we are in the test, or we're done (ind==count). 
             // So start over?
             console.log('Index is %d, about to ask for help', current_question_index); 
+            var demo = 1;
+            if (demo ) {
+                // TODO: if (easy) {}
+                session.say('Your score is 3 out of 3', 'Good job. Your score is 3 out of 3. ');  // DEBUG: Can you hear this? TODO: put question prompt into a card.
+                // TODO: else {}
+            }
+
 
             // TODO: Display score.
             session.replaceDialog('HelpDialog', {test: session.conversationData.test, msg: 'Do you want another test?'});
         }
     },
     function (session, results) {
-
+        var dbg = 0;
         var lastUtterance = results.response;
         // session.send('Ok, sounds like your answer was: %s', lastUtterance);
-        var textToEcho = sprintf("Ok, sounds like your answer was: %s", lastUtterance);
-        session.say(textToEcho, 'good answer', { inputHint: builder.InputHint.ignoringInput });  // TODO: rate answer based on intent score
+        var textToEcho = sprintf("I heard your last answer as: %s", lastUtterance);
+        // TODO: For demo give hard mode, ok.
+
         var officialAnswer = session.conversationData.questions[session.conversationData.test.current_question_index].answer;
         var txtOfficialAnswer = sprintf('The official answer is: %s', officialAnswer);
-        session.say(txtOfficialAnswer, txtOfficialAnswer, { inputHint: builder.InputHint.ignoringInput } ); // TODO: put textToEcho in the card to display - So, putting many fields in one card.
+        if (dbg) {
+            session.say(textToEcho, 'good answer', { inputHint: builder.InputHint.ignoringInput });  
+            // TODO: rate answer based on intent score
+            session.say(txtOfficialAnswer, txtOfficialAnswer, { inputHint: builder.InputHint.ignoringInput } ); 
+            // TODO: put textToEcho in the card to display - So, putting many fields in one card.
+        }
         // TODO: put textToEcho in the card to display.
         /*****
          * 
-         * 
+         * Render results using a card
          * 
          * 
          */
+
+        var card = new builder.HeroCard(session)
+            .subtitle(textToEcho) // echo what we heard in subtitle.
+            .buttons([ // for question help
+                builder.CardAction.imBack(session, 'repeat this question', 'Repeat Question'), // TODO replace buttons
+                builder.CardAction.imBack(session, 'help with this question', 'Help with Question')
+            ]);
+
+            card.title('Good answer');
+            // show official answer in card
+            card.text(txtOfficialAnswer);
+        
+        var msg = new builder.Message(session).addAttachment(card);
+            // Build up spoken response to that answer.
+            var spoken = 'good answer';
+            msg.speak(ssml.speak(spoken));
+            msg.text = 'MSG.TEXT';
+            msg.inputHint(builder.InputHint.ignoringInput);   
+            session.send(msg); //.endDialog();
+        /************* END CARD */
 
         session.conversationData.test.current_question_index++; // increment count if we got a recognized result.
         // Ask another question 
@@ -314,15 +376,30 @@ bot.customAction({
  * tooltip display.
  */
 bot.dialog('HelpDialog', function (session) {
-    
+    var demo = 1;
+    var help_title = '';
+    var help_ssml = '';
+    if (demo) {
+        help_title ='Test Options';
+        // session.conversationData.test.turns
+        if (session.conversationData.turns > 0 ) {
+            help_ssml = 'Do you want to try another quiz? To take another test, say repeat.'
+        } else {
+           help_ssml = 'I can give you quiz questions from the US citizenship exam. To start, say take a test.';
+        }
+
+    } else {
+        help_title = 'help_title';
+        help_ssml = 'help_ssml';
+    }
     var card = new builder.HeroCard(session)
-        .title('help_title')
+        .title(help_title)
         .buttons([
             builder.CardAction.imBack(session, 'take test', 'New Test'),
             builder.CardAction.imBack(session, 'repeat', 'Repeat Previous Test')
         ]);
     var msg = new builder.Message(session)
-        .speak(speak(session, 'help_ssml'))
+        .speak(speak(session, help_ssml))
         .addAttachment(card)
         .inputHint(builder.InputHint.acceptingInput);
     session.send(msg).endDialog();
