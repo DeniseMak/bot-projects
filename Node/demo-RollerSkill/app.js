@@ -267,7 +267,7 @@ bot.dialog('AskQuestionDialog', [
     function (session, args) {
         var debug = 1;
         var current_question_index = session.conversationData.test.current_question_index;
-        var test_question = sprintf('Got into Ask Question dialog and first question is: %s', session.conversationData.test[current_question_index].question);
+        var test_question = sprintf('Got into Ask Question dialog and first question is: %s', session.conversationData.questions[current_question_index].question);
         if (debug ) {
             console.log('*******\nDebug: %s. \n*****\n', test_question); 
             session.say(null, test_question);  // DEBUG: Can you hear this? TODO: put question prompt into a card.
