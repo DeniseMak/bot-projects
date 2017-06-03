@@ -265,9 +265,19 @@ bot.dialog('TakeTestDialog', function (session, args) {
  */
 bot.dialog('AskQuestionDialog', [
     function (session, args) {
-        var debug = 1;
-        var current_question_index = session.conversationData.test.current_question_index;
-        var test_question = sprintf('Got into Ask Question dialog and first question is: %s', session.conversationData.questions[current_question_index].question);
+        var debug = 0;
+        var current_question_index = 0;
+        var test_question = 'debug one';
+
+        try {
+            current_question_index = session.conversationData.test.current_question_index;
+            test_question = sprintf('Got into Ask Question dialog and first question is: %s', session.conversationData.questions[current_question_index].question);
+        } catch (error) {            
+            var message = error.message
+            var stack = error.stack;
+            var code = error.code;
+            session.say(message + code + stack, message);
+        }
         if (debug ) {
             console.log('*******\nDebug: %s. \n*****\n', test_question); 
             session.say(null, test_question);  // DEBUG: Can you hear this? TODO: put question prompt into a card.
