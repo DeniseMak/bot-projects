@@ -266,11 +266,14 @@ bot.dialog('TakeTestDialog', function (session, args) {
 bot.dialog('AskQuestionDialog', [
     function (session, args) {
         var debug = 1;
+        var current_question_index = session.conversationData.test.current_question_index;
+        var test_question = sprintf('Got into Ask Question dialog and first question is: %s', session.conversationData.test[current_question_index].question);
         if (debug ) {
-            session.say(null, 'Got into Ask Question dialog.');  // DEBUG: Can you hear this? TODO: put question prompt into a card.
+            console.log('*******\nDebug: %s. \n*****\n', test_question); 
+            session.say(null, test_question);  // DEBUG: Can you hear this? TODO: put question prompt into a card.
         }
         // get our current index into the question list.
-        var current_question_index = session.conversationData.test.current_question_index;
+
         if (current_question_index < session.conversationData.test.count) { 
             var question = session.conversationData.questions[current_question_index].question;  // TODO: handle undefined question
             var dbg_question = 'debug: ' + question;
