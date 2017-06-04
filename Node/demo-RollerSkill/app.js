@@ -276,6 +276,11 @@ bot.dialog('AskQuestionDialog', [
           {question: 'What did Martin Luther King, Jr. do?', answer: 'He fought for civil rights and worked for equality for all Americans'},
           {question: 'What are two cabinet-level positions', answer: 'Secretary of State, Secretary of Labor'}
         ];
+
+        // Add a pause before asking another question.
+        setTimeout(function () {
+              console.log('Waiting 3 seconds before next question.')
+        }, 5000);
         try {
             current_question_index = session.conversationData.test.current_question_index;
             test_question = sprintf('Got into Ask Question dialog and first question is: %s', session.conversationData.questions[current_question_index].question);
@@ -360,10 +365,7 @@ bot.dialog('AskQuestionDialog', [
 
         session.conversationData.test.current_question_index++; // increment count if we got a recognized result.
 
-        // Add a pause before asking another question.
-            setTimeout(function () {
-                console.log('Waiting 3 seconds before next question.')
-            }, 3000);
+
 
         // Ask another question 
         session.replaceDialog('AskQuestionDialog');
