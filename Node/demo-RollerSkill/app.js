@@ -268,7 +268,14 @@ bot.dialog('AskQuestionDialog', [
         var debug = 0;
         var current_question_index = 0;
         var test_question = 'debug one';
-
+        session.conversationData.questions = [
+          {question: 'What is the capital of the United States?', answer: 'Washington, D.C.'},
+          {question: 'Where is the Statue of Liberty?', answer: 'New York (Harbor) or Liberty Island'},
+          {question: 'Why does the flag have 50 stars?', answer: 'because there are 50 states'},
+          {question: 'When do we celebrate Independence Day?', answer: 'July 4'},
+          {question: 'What did Martin Luther King, Jr. do?', answer: 'He fought for civil rights and worked for equality for all Americans'},
+          {question: 'What are two cabinet-level positions', answer: 'Secretary of State, Secretary of Labor'}
+        ];
         try {
             current_question_index = session.conversationData.test.current_question_index;
             test_question = sprintf('Got into Ask Question dialog and first question is: %s', session.conversationData.questions[current_question_index].question);
