@@ -347,7 +347,8 @@ bot.dialog('AskQuestionDialog', [
             .subtitle(textToEcho) // echo what we heard in subtitle.
             .buttons([ // for question help
                 builder.CardAction.imBack(session, 'repeat this question', 'Repeat Question'), // TODO replace buttons
-                builder.CardAction.imBack(session, 'help with this question', 'Help with Question')
+                builder.CardAction.imBack(session, 'help with this question', 'Help with Question'),
+                builder.CardAction.imBack(session, 'Next', 'Next')
             ]);
 
             card.title('Good answer');
@@ -360,17 +361,19 @@ bot.dialog('AskQuestionDialog', [
             msg.speak(ssml.speak(spoken));
             msg.text = 'MSG.TEXT';
             msg.inputHint(builder.InputHint.ignoringInput);   
-            session.send(msg); //.endDialog();
+            session.send(msg).endDialog(); //.endDialog();
         /************* END CARD */
 
         session.conversationData.test.current_question_index++; // increment count if we got a recognized result.
 
 
-
-        // Ask another question 
-        session.replaceDialog('AskQuestionDialog');
+        var hasDisplay = 1;
+        if (!hasDisplay) {
+          // Ask another question 
+          session.replaceDialog('AskQuestionDialog');
+        }
     }
-]);
+]).triggerAction({ matches: /Next/i });;
 
 
 
