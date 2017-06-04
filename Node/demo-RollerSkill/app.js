@@ -300,8 +300,12 @@ bot.dialog('AskQuestionDialog', [
                 session.say(dbg_question, dbg_question);
                 // session.say(session.message.text,session.message.text);
             } 
-              builder.Prompts.text(session, question);
-            
+              // builder.Prompts.text(session, question);
+              builder.Prompts.text(session, question, {            
+                    speak: question,
+                    retrySpeak: question,
+                    inputHint: builder.InputHint.expectingInput
+              });
         } else {
             // we don't know where we are in the test, or we're done (ind==count). 
             // So start over?
