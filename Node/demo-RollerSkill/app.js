@@ -337,13 +337,6 @@ bot.dialog('AskQuestionDialog', [
             session.say(txtOfficialAnswer, txtOfficialAnswer, { inputHint: builder.InputHint.ignoringInput } ); 
             // TODO: put textToEcho in the card to display - So, putting many fields in one card.
         }
-        // TODO: put textToEcho in the card to display.
-        /*****
-         * 
-         * Render results using a card
-         * 
-         * 
-         */
 
         var card = new builder.HeroCard(session)
             .subtitle(textToEcho) // echo what we heard in subtitle.
@@ -366,6 +359,12 @@ bot.dialog('AskQuestionDialog', [
         /************* END CARD */
 
         session.conversationData.test.current_question_index++; // increment count if we got a recognized result.
+
+        // Add a pause before asking another question.
+            setTimeout(function () {
+                console.log('Waiting 3 seconds before next question.')
+            }, 3000);
+
         // Ask another question 
         session.replaceDialog('AskQuestionDialog');
     }
