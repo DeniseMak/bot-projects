@@ -87,7 +87,7 @@ bot.dialog('CreateTestDialog', [
             { value: 'hard', action: { title: 'Hard' }, synonyms: 'hard|hard ones|hard questions' },
             { value: 'both', action: { title: 'Both' }, synonyms: 'both|both kinds|combination' },
         ];
-        var demo = 1;
+        var demo = 0;
         var prompt = '';
         var spoken_prompt = '';
         if (demo) {
@@ -116,7 +116,7 @@ bot.dialog('CreateTestDialog', [
          * - The number prompt lets us pass additional options to say we only want
          *   integers back and what's the min & max value that's allowed.
          */
-        var demo = 1;
+        var demo = 0;
         var prompt = '';
         var spoken_prompt = '';
         if (demo) {
@@ -329,12 +329,15 @@ bot.dialog('AskQuestionDialog', [
         var lastUtterance = results.response;
         // session.send('Ok, sounds like your answer was: %s', lastUtterance);
         var textToEcho = sprintf("I heard your last answer as: %s", lastUtterance);
-        // TODO: For demo give hard mode, ok.
+
+        // TODO: Adjust goodOKBad based on either LUIS intent confidence score or regex or a combination of both.
+        var goodOKBad = 'That answer was OK.';
+        var nextTip = '';
 
         var officialAnswer = session.conversationData.questions[session.conversationData.test.current_question_index].answer;
         var txtOfficialAnswer = sprintf('The official answer is: %s', officialAnswer);
         if (dbg) {
-            session.say(textToEcho, 'good answer', { inputHint: builder.InputHint.ignoringInput });  
+            session.say(textToEcho, goodOKBad, { inputHint: builder.InputHint.ignoringInput });  
             // TODO: rate answer based on intent score
             session.say(txtOfficialAnswer, txtOfficialAnswer, { inputHint: builder.InputHint.ignoringInput } ); 
             // TODO: put textToEcho in the card to display - So, putting many fields in one card.
@@ -348,22 +351,30 @@ bot.dialog('AskQuestionDialog', [
                 builder.CardAction.imBack(session, 'Next', 'Next')
             ]);
 
-            card.title('Good answer');
+            // TODO: Adjust the sentiment of this string based on calculated intent
+            card.title(goodOKBad);
+
+              
             // show official answer in card
             card.text(txtOfficialAnswer);
         
         var msg = new builder.Message(session).addAttachment(card);
             // Build up spoken response to that answer.
-            var spoken = 'good answer';
+            var spoken = goodOKBad;
             msg.speak(ssml.speak(spoken));
             msg.text = 'MSG.TEXT';
-            msg.inputHint(builder.InputHint.ignoringInput);   
-            session.send(msg).endDialog(); //.endDialog();
+
+            // is ignoringInput the problem?
+            msg.inputHint(builder.InputHint.acceptingInput);    
+
+            session.conversationData.test.current_question_index++; // increment count if we got a recognized result.
+            session.send(msg).endDialog(); //.endDialog(); 
         /************* END CARD */
 
-        session.conversationData.test.current_question_index++; // increment count if we got a recognized result.
 
 
+        // We repeat displaying the dialog without requiring the Next button 
+        // if there's no display
         var hasDisplay = 1;
         if (!hasDisplay) {
           // Ask another question 
@@ -402,7 +413,7 @@ bot.customAction({
  * tooltip display.
  */
 bot.dialog('HelpDialog', function (session) {
-    var demo = 1;
+    var demo = 0;
     var help_title = '';
     var help_ssml = '';
     if (demo) {
