@@ -44,6 +44,9 @@ var bot = new builder.UniversalBot(connector, function (session) {
     session.replaceDialog('HelpDialog');
 });
 
+// Enable Conversation Data persistence
+bot.set('persistConversationData', true);
+
 /**
  * This dialog sets up a test for the bot to administer.  It will 
  * ask the user for the difficulty level. The difficulty level can include:
@@ -62,15 +65,17 @@ bot.dialog('CreateTestDialog', [
         // Initialize game structure.
         // - dialogData gives us temporary storage of this data in between
         //   turns with the user.
-        var test = session.dialogData.test = { 
+        var test = session.conversationData.test = { 
             type: 'custom', 
             level: null, 
-            count: null,
+            count: null, // number of question the user wants to do.
             questions_picked: {}, 
             current_question_index: 0,
-            turns: 0
+            turns: 0,
+            num_questions: 0,
+            score: 0
         };
-
+        session.dialogData.test = test;
         /**
          * Ask for the difficult level.
          * 
@@ -267,14 +272,21 @@ bot.dialog('AskQuestionDialog', [
     function (session, args) {
         var debug = 0;
         var current_question_index = 0;
-        var test_question = 'debug one';
+        var test_question = 'used for debugging only';
+        var score = 0;
+        //if (args) {
+        //    score = args.test.score;  // don't need to do this if ConversationData persists.
+        //} else {
+            score = session.conversationData.test.score;
+        //}
+         
         session.conversationData.questions = [
-          {question: 'What is the capital of the United States?', answer: 'Washington, D.C.'},
-          {question: 'Where is the Statue of Liberty?', answer: 'New York (Harbor) or Liberty Island'},
-          {question: 'Why does the flag have 50 stars?', answer: 'because there are 50 states'},
-          {question: 'When do we celebrate Independence Day?', answer: 'July 4'},
-          {question: 'What did Martin Luther King, Jr. do?', answer: 'He fought for civil rights and worked for equality for all Americans'},
-          {question: 'What are two cabinet-level positions', answer: 'Secretary of State, Secretary of Labor'}
+          {question: 'What is the capital of the United States?', answer: 'Washington, D.C.', qId: 1},
+          {question: 'Where is the Statue of Liberty?', answer: 'New York (Harbor) or Liberty Island', qId: 2},
+          {question: 'Why does the flag have 50 stars?', answer: 'because there are 50 states', qId: 3},
+          {question: 'When do we celebrate Independence Day?', answer: 'July 4', qId: 4},
+          {question: 'What did Martin Luther King, Jr. do?', answer: 'He fought for civil rights and worked for equality for all Americans', qId: 5},
+          {question: 'What are two cabinet-level positions', answer: 'Secretary of State, Secretary of Labor', qId: 6}
         ];
 
 
@@ -289,12 +301,14 @@ bot.dialog('AskQuestionDialog', [
         }
         if (debug ) {
             console.log('*******\nDebug: %s. \n*****\n', test_question); 
-            session.say(null, test_question);  // DEBUG: Can you hear this? TODO: put question prompt into a card.
+            session.say(null, test_question);  
         }
         // get our current index into the question list.
 
         if (current_question_index < session.conversationData.test.count) { 
             var question = session.conversationData.questions[current_question_index].question;  // TODO: handle undefined question
+            var qId = session.conversationData.questions[current_question_index].qId; 
+            session.dialogData.qId = qId;
             var dbg_question = 'debug: ' + question;
             console.log('*******\nQuestion #%d is %s. \n*****\n', current_question_index, question); 
             // ask the question
@@ -309,13 +323,16 @@ bot.dialog('AskQuestionDialog', [
                     inputHint: builder.InputHint.expectingInput
               });
         } else {
-            // we don't know where we are in the test, or we're done (ind==count). 
-            // So start over?
-            console.log('Index is %d, about to ask for help', current_question_index); 
+            /*      
+             *   We're done (ind==count).       
+             *   */ 
+            console.log('Index is %d, about to finish', current_question_index); 
             var demo = 1;
+            var count = session.conversationData.test.count;
             if (demo ) {
                 // TODO: if (easy) {}
-                session.say('Your score is 3 out of 3', 'Good job. Your score is 3 out of 3. ');  // DEBUG: Can you hear this? TODO: put question prompt into a card.
+                var strScore = sprintf('Your score is %f out of %d', session.conversationData.test.score, count);
+                session.say(strScore, strScore);  
                 // TODO: else {}
             }
 
@@ -330,12 +347,29 @@ bot.dialog('AskQuestionDialog', [
         // session.send('Ok, sounds like your answer was: %s', lastUtterance);
         var textToEcho = sprintf("I heard your last answer as: %s", lastUtterance);
 
-        // TODO: Adjust goodOKBad based on either LUIS intent confidence score or regex or a combination of both.
+        // Adjust goodOKBad based on either LUIS intent confidence score or regex or a combination of both.
         var goodOKBad = 'That answer was OK.';
-        var nextTip = '';
+        var qId = session.dialogData.qId;        
+        var curr_q_score = judgeAnswer(qId, lastUtterance); 
+
+        // update total score
+        session.conversationData.test.score += curr_q_score;
+
+        if (curr_q_score > .6) {
+            goodOKBad = 'Good answer';
+        } else if (curr_q_score > .4) {
+            goodOKBad = 'That answer was OK';
+        } else {
+            goodOKBad = 'Hmm, I\'m not sure about that answer.';
+        }
+        // TODO: Speak the correct answer based on curr_q_score
+
+        var nextTip = ' * Click or say Next for the next question.';
 
         var officialAnswer = session.conversationData.questions[session.conversationData.test.current_question_index].answer;
         var txtOfficialAnswer = sprintf('The official answer is: %s', officialAnswer);
+        txtOfficialAnswer = txtOfficialAnswer + nextTip;
+
         if (dbg) {
             session.say(textToEcho, goodOKBad, { inputHint: builder.InputHint.ignoringInput });  
             // TODO: rate answer based on intent score
@@ -351,7 +385,7 @@ bot.dialog('AskQuestionDialog', [
                 builder.CardAction.imBack(session, 'Next', 'Next')
             ]);
 
-            // TODO: Adjust the sentiment of this string based on calculated intent
+            // Adjust the sentiment of this string based on calculated intent
             card.title(goodOKBad);
 
               
@@ -361,7 +395,7 @@ bot.dialog('AskQuestionDialog', [
         var msg = new builder.Message(session).addAttachment(card);
             // Build up spoken response to that answer.
             var spoken = goodOKBad;
-            msg.speak(ssml.speak(spoken));
+            msg.speak(ssml.speak(spoken));   // ****** TODO - Check if this is the spoken tip if they didn't get the answer right **** 
             msg.text = 'MSG.TEXT';
 
             // is ignoringInput the problem?
@@ -381,7 +415,7 @@ bot.dialog('AskQuestionDialog', [
           session.replaceDialog('AskQuestionDialog');
         }
     }
-]).triggerAction({ matches: /Next/i });;
+]).triggerAction({ matches: /Next/i});; // TODO BUGBUG: Pass test structure with score dialogArgs: {test: session.conversationData.test}
 
 
 
@@ -448,4 +482,67 @@ function speak(session, prompt) {
     loc = session.preferredLocale();
     var localized = session.localizer.gettext(loc, prompt);
     return ssml.speak(localized);
+}
+
+/** 
+ * Returns a number between 0 and 1 that indicates the confidence that the answer was correct.
+ * 
+ * For some questions, it's enough to check that the answer contains specified substrings, or matches a pattern.
+ * 
+ * For other more complex questions, we will pass the answer to an intent recognition service (LUIS).
+ * The LUIS model has been trained on labeled sets of correct and incorrect answers. 
+ * LUIS provides a confidence score on the correctness of the answer, and extracts relevant entities from the utterance.
+ * 
+ */
+function judgeAnswer(qId, utterance) {
+
+    var score = 0;
+    luisScore = 0;
+    entitiesMatched = 0;
+    switch (qId)
+    {
+        case(1):
+            console.log('judgeAnswer: qId ==1');
+            if (utterance !== undefined && utterance !== null) {
+                console.log('judgeAnswer: utterance = %s', utterance);
+                var match = utterance.match(/\w*(Washington).+(D\.*\s*C\.*|District of Columbia)\w*/i);
+                if (match !== null) {
+                    score = 1;
+                    return score;
+                } else {
+                    if (utterance.match(/\w*(Washington)\w*/i) || utterance.match(/D\.*\s*C\.*|District\s*\w*\s*(Columbia)\w*/i)) {
+                        score = 0.5;
+                        console.log('judgeAnswer: partial match on utterance=%s', utterance);
+                        return score;
+                    } else {
+                        console.log("no match for qId=1, utterance=%s", utterance);
+                    }
+                   
+                }
+                if (match !== null) {
+                    var arrayLength = match.length;
+                    for (var i = 0; i < arrayLength; i++) {
+                        console.log('QID:%d, Matched %s.', qId, match[i]);
+                    }
+                }
+            } else {
+                console.log("null utterance for qId=1");
+            }
+            return score;
+            
+        case(2):
+            score = 1;
+            return score;
+
+        case(3):
+            score = 1;
+            return score;
+
+        // These are questions requiring LUIS    
+        case(qId > 10):
+        // luisScore = getLuisScore(qId, utterance)
+        
+        default:
+    }
+    return 0;
 }
