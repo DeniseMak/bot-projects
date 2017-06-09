@@ -30,14 +30,16 @@ server.post('/api/messages', connector.listen());
  */
 var bot = new builder.UniversalBot(connector, function (session) {
     // set up global data
+
+    // TODO: Move this to Help, to set once - in case it won't be persisted before call to set.
     session.conversationData.questions = [
         {question: 'What is the capital of the United States?', answer: 'Washington, D.C.'},
         {question: 'Where is the Statue of Liberty?', answer: 'New York (Harbor) or Liberty Island'},
         {question: 'Why does the flag have 50 stars?', answer: 'because there are 50 states'},
         {question: 'When do we celebrate Independence Day?', answer: 'July 4'},
         {question: 'What did Martin Luther King, Jr. do?', answer: 'He fought for civil rights and worked for equality for all Americans'},
+        {question: 'What is one right or freedom from the First Amendment?', answer: 'Secretary of State, Secretary of Labor'},
         {question: 'What are two cabinet-level positions', answer: 'Secretary of State, Secretary of Labor'}
-
         ];
     session.conversationData.turns = 0;
     // Just redirect to our 'HelpDialog'.
@@ -76,8 +78,47 @@ bot.dialog('CreateTestDialog', [
             score: 0
         };
         session.dialogData.test = test;
+
+        session.conversationData.questions = [
+            // Questions for those over 65 who have lived in the states for over 20 years.
+            { question: 'What is the capital of the United States?', answer: 'Washington, D.C.', qId: 1 },
+            { question: 'Where is the Statue of Liberty?', answer: 'New York (Harbor) or Liberty Island', qId: 2 },
+            { question: 'Why does the flag have 50 stars?', answer: 'because there are 50 states', qId: 3 },
+            { question: 'When do we celebrate Independence Day?', answer: 'July 4', qId: 4 },
+            { question: 'What did Martin Luther King, Jr. do?', answer: 'He fought for civil rights and worked for equality for all Americans', qId: 5 }, // duplicate.
+            { question: 'What is one right or freedom from the First Amendment?', answer: 'Any of: speech, religion, assembly, press, petition the government', qId: 6 },
+            { question: 'What is the economic system in the United States?', answer: 'Either of: capitalist economy, market economy', qId: 7 },
+            { question: 'Name one branch or part of the government.', answer: 'Any of: Congress, legislative, President, executive, the courts, judicial', qId: 7 },
+            { question: 'What are the two parts of the U.S. Congress?', answer: 'the Senate and House (of Representatives)', qId: 9 },
+            { question: 'Who is one of your state’s U.S. Senators now?', answer: 'varies depending on your state. See https://en.wikipedia.org/wiki/List_of_current_United_States_Senators', qId: 10 }, // Use list entity recognizer
+            { question: 'In what month do we vote for President?', answer: 'November', qId: 11 },
+            { question: 'What is the name of the President of the United States now?', answer: 'Any of: Donald J. Trump, Donald Trump, Trump', qId: 12 },
+            { question: 'What is the capital of your state?*', answer: '', qId: 13 }, // Use list entity recognizer
+            { question: 'What are the two major political parties in the United States?', answer: 'Democratic and Republican', qId: 14 },
+            { question: 'What is one responsibility that is only for United States citizens?', answer: 'serve on a jury, or vote in a federal election', qId: 15 },
+            { question: 'How old do citizens have to be to vote for President?', answer: 'eighteen (18) and older', qId: 16 },
+            { question: 'When is the last day you can send in federal income tax forms?', answer: 'April 15', qId: 17 },
+            { question: 'Who was the first President?', answer: '(George) Washington', qId: 18 },
+            { question: 'What was one important thing that Abraham Lincoln did?', answer: 'freed the slaves (Emancipation Proclamation), saved (or preserved) the Union, led the United States during the Civil War', qId: 19 }, // Use Intent recognizer
+            { question: ' Name one war fought by the United States in the 1900s.', answer: 'World War I, World War II, Korean War, Vietnam War, (Persian) Gulf War', qId: 20 },  // List entity or phrase list
+            { question: 'What did Martin Luther King, Jr. do?', answer: 'fought for civil rights, worked for equality for all Americans', qId: 21 },  // Intent recognizer
+            /* { question: 'What does the President’s Cabinet do?', answer: 'advises the President', qId: 35 },
+            { question: '', answer: '', qId: 23 },
+            { question: '', answer: '', qId: 24 },
+            { question: '', answer: '', qId: 25 },
+            { question: '', answer: '', qId: 26 }, 
+            { question: 'What are two cabinet-level positions', answer: 'Secretary of State, Secretary of Labor', qId: 36 }
+            */
+            // --- begin slightly harder questions
+
+        ];
+
         /**
-         * Ask for the difficult level.
+         * shuffle the questions
+         */
+        session.conversationData.questions = shuffle(session.conversationData.questions);
+        /**
+         * Ask for the difficulty level.
          * 
          * You can pass an array of choices to be matched. These will be shown as a
          * numbered list by default.  This list will be shown as a numbered list which
@@ -129,7 +170,7 @@ bot.dialog('CreateTestDialog', [
             spoken_prompt = 'How many questions? Choose a number from 1 to ten.';
         } else {
             prompt = session.gettext('choose_count_questions', test.level);
-            spoken_prompt = 'choose_count_ssml'
+            spoken_prompt = 'choose_count_ssml'  // TODO: UPDATE
         }
         builder.Prompts.number(session, prompt, {
             speak: speak(session, spoken_prompt),
@@ -145,7 +186,7 @@ bot.dialog('CreateTestDialog', [
         test.count = results.response;
         // session.conversationData.test.count = test.count;
         /**
-         * Play the game we just created.
+         * Start the quiz we just initialized.
          * 
          * We can use replaceDialog() to end the current dialog and start a new
          * one in its place. We can pass arguments to dialogs so we'll pass the
@@ -273,22 +314,48 @@ bot.dialog('AskQuestionDialog', [
         var debug = 0;
         var current_question_index = 0;
         var test_question = 'used for debugging only';
-        var score = 0;
-        //if (args) {
-        //    score = args.test.score;  // don't need to do this if ConversationData persists.
-        //} else {
-            score = session.conversationData.test.score;
-        //}
-         
-        session.conversationData.questions = [
-          {question: 'What is the capital of the United States?', answer: 'Washington, D.C.', qId: 1},
-          {question: 'Where is the Statue of Liberty?', answer: 'New York (Harbor) or Liberty Island', qId: 2},
-          {question: 'Why does the flag have 50 stars?', answer: 'because there are 50 states', qId: 3},
-          {question: 'When do we celebrate Independence Day?', answer: 'July 4', qId: 4},
-          {question: 'What did Martin Luther King, Jr. do?', answer: 'He fought for civil rights and worked for equality for all Americans', qId: 5},
-          {question: 'What are two cabinet-level positions', answer: 'Secretary of State, Secretary of Labor', qId: 6}
-        ];
+        var score = session.conversationData.test.score;
 
+        /**
+         * TODO: Handle the case in which a user says Next but is not inside a test.
+         */
+        if (session.conversationData.questions == undefined || session.conversationData.questions == null) {
+            // SHOULDN'T BE HERE
+            console.log('AskQuestionDialog: conversationData.questions was undef or null.')
+            session.conversationData.questions = [
+                // Questions for those over 65 who have lived in the states for over 20 years.
+                { question: 'What is the capital of the United States?', answer: 'Washington, D.C.', qId: 1 },
+                { question: 'Where is the Statue of Liberty?', answer: 'New York (Harbor) or Liberty Island', qId: 2 },
+                { question: 'Why does the flag have 50 stars?', answer: 'because there are 50 states', qId: 3 },
+                { question: 'When do we celebrate Independence Day?', answer: 'July 4', qId: 4 },
+                { question: 'What did Martin Luther King, Jr. do?', answer: 'He fought for civil rights and worked for equality for all Americans', qId: 5 },
+                { question: 'What is one right or freedom from the First Amendment?', answer: 'Any of: speech, religion, assembly, press, petition the government', qId: 6 },
+                { question: 'What is the economic system in the United States?', answer: 'Either of: capitalist economy, market economy', qId: 7 },
+                { question: 'Name one branch or part of the government.', answer: 'Any of: Congress, legislative, President, executive, the courts, judicial', qId: 7 },
+                { question: 'What are the two parts of the U.S. Congress?', answer: 'the Senate and House (of Representatives)', qId: 9 },
+                { question: 'Who is one of your state’s U.S. Senators now?', answer: 'varies depending on your state. See https://en.wikipedia.org/wiki/List_of_current_United_States_Senators', qId: 10 }, // Use list entity recognizer
+                { question: 'In what month do we vote for President?', answer: 'November', qId: 11 },
+                { question: 'What is the name of the President of the United States now?', answer: 'Any of: Donald J. Trump, Donald Trump, Trump', qId: 12 },
+                { question: 'What is the capital of your state?*', answer: '', qId: 13 }, // Use list entity recognizer
+                { question: 'What are the two major political parties in the United States?', answer: 'Democratic and Republican', qId: 14 },
+                { question: 'What is one responsibility that is only for United States citizens?', answer: 'serve on a jury, or vote in a federal election', qId: 15 },
+                { question: 'How old do citizens have to be to vote for President?', answer: 'eighteen (18) and older', qId: 16 },
+                { question: 'When is the last day you can send in federal income tax forms?', answer: 'April 15', qId: 17 },
+                { question: 'Who was the first President?', answer: '(George) Washington', qId: 18 },
+                { question: 'What was one important thing that Abraham Lincoln did?', answer: 'freed the slaves (Emancipation Proclamation), saved (or preserved) the Union, led the United States during the Civil War', qId: 19 }, // Use Intent recognizer
+                { question: ' Name one war fought by the United States in the 1900s.', answer: 'World War I, World War II, Korean War, Vietnam War, (Persian) Gulf War', qId: 20 },  // List entity or phrase list
+                { question: 'What did Martin Luther King, Jr. do?', answer: 'fought for civil rights, worked for equality for all Americans', qId: 21 },  // Intent recognizer
+                /* { question: 'What does the President’s Cabinet do?', answer: 'advises the President', qId: 35 },
+                { question: '', answer: '', qId: 23 },
+                { question: '', answer: '', qId: 24 },
+                { question: '', answer: '', qId: 25 },
+                { question: '', answer: '', qId: 26 }, 
+                { question: 'What are two cabinet-level positions', answer: 'Secretary of State, Secretary of Labor', qId: 36 }
+                */
+                // --- begin slightly harder questions
+
+            ];
+        }
 
         try {
             current_question_index = session.conversationData.test.current_question_index;
@@ -380,8 +447,8 @@ bot.dialog('AskQuestionDialog', [
         var card = new builder.HeroCard(session)
             .subtitle(textToEcho) // echo what we heard in subtitle.
             .buttons([ // for question help
-                builder.CardAction.imBack(session, 'repeat this question', 'Repeat Question'), // TODO replace buttons
-                builder.CardAction.imBack(session, 'help with this question', 'Help with Question'),
+                //builder.CardAction.imBack(session, 'repeat this question', 'Repeat Question'), // TODO replace buttons
+                //builder.CardAction.imBack(session, 'help with this question', 'Help with Question'),
                 builder.CardAction.imBack(session, 'Next', 'Next')
             ]);
 
@@ -546,3 +613,32 @@ function judgeAnswer(qId, utterance) {
     }
     return 0;
 }
+
+/**
+ * 
+ * Used like so:
+ * var arr = [2, 11, 37, 42];
+ * arr = shuffle(arr);
+ * console.log(arr);
+ * 
+ * @param {*} array 
+ */
+function shuffle(array) {
+  var currentIndex = array.length, temporaryValue, randomIndex;
+
+  // While there remain elements to shuffle...
+  while (0 !== currentIndex) {
+
+    // Pick a remaining element...
+    randomIndex = Math.floor(Math.random() * currentIndex);
+    currentIndex -= 1;
+
+    // And swap it with the current element.
+    temporaryValue = array[currentIndex];
+    array[currentIndex] = array[randomIndex];
+    array[randomIndex] = temporaryValue;
+  }
+
+  return array;
+}
+
