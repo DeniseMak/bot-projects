@@ -1,32 +1,37 @@
-# Roller Sample Skill
+# LING 575 project: Citizenship Quiz Cortana Skill and Speech-enabled WebChat Control
 
-A simple dice rolling skill/bot that's been optimized for speech enabled channels. 
+For the project description and write-up see: https://aka.ms/dmak-sds-575-description
+For the running demo see: https://aka.ms/dmak-sds-575-test
 
-[![Deploy to Azure][Deploy Button]][Deploy Node/RollerSkill]
+The webchat-control folder contains the Web Chat Control, and the cortana-skill folder contains the server-side bot dialogs that both the Web Chat Control and Cortana would communicate with.
 
-[Deploy Button]: https://azuredeploy.net/deploybutton.png
-[Deploy Node/RollerSkill]: https://azuredeploy.net
+## Web Chat Control 
 
-### Prerequisites
+Embeddable web chat control for giving quiz questions from the US naturalization exam, built using the [Microsoft Bot Framework](http://www.botframework.com) and the [DirectLine](https://docs.botframework.com/en-us/restapi/directline3/) API.
+It is based on the project here: https://github.com/Microsoft/BotFramework-WebChat
 
-The minimum prerequisites to run this sample are:
-* Latest Node.js with NPM. Download it from [here](https://nodejs.org/en/download/).
-* The Bot Framework Emulator. To install the Bot Framework Emulator, download it from [here](https://emulator.botframework.com/). Please refer to [this documentation article](https://github.com/microsoft/botframework-emulator/wiki/Getting-Started) to know more about the Bot Framework Emulator.
-* **[Recommended]** Visual Studio Code for IntelliSense and debugging, download it from [here](https://code.visualstudio.com/) for free.
+* Note: The web chat control only works in the Chrome browser. 
+Safari does not yet support the speech API it uses.
 
-### Code Highlights
+The web control is a front end to a bot runs as a web service similar to  [Azure Bot Service](https://azure.microsoft.com/en-us/services/bot-service/)
 
-The sample showcases the use of new features designed specifically for speech:
 
-* **IMessage.speak**: Lets include Speech Synthesis Markup Language (SSML) in your bots responses to control what the bot says, in addition to what it shows. A small [utility module](ssml.js) is included to simplify building up your bots SSML based responses.
-* **IMessage.inputHint**: Used to provide a speech based client with hints as to how they should manage the microphone. A hint of `InputHints.ignoringInput` can be sent to tell the client that the bot will be sending more messages and should wait to open the mic. The `InputHints.acceptingInput` hint means that the bot is finished speaking and ready to receive additional requests from the user but the mic should be closed. And the `InputHints.expectingInput` hint indicates that the bot is expecting an answer to a prompt and the mic should be left open. In general, the SDK will send these hints for you automatically so you don't have to worry too much about them.
-* **Session.say()**: A new method that can be called in place of `Session.send()` and includes additional parameters for sending SSML output, as well as attachments like cards. 
-* **IPromptOptions.speak & retrySpeak**: The built-in prompts have all been updated to support sending SSML as part of the prompts output.
-* **Prompts.choice() synonyms**: The built-in choice() prompt has been updated to support passing in synonyms which allows for more flexibility recognition wise.
-* **Other Prompt Improvements**: A number of other improvements have been made to the built-in prompts to add with building bots that work better with speech recognition.
+It is not necessary for you to build the project in order to run it, because you can just run the web chat control from a web page. The instructions and live web control are posted are at: https://aka.ms/dmak-sds-575-test. This web control is easier to test if you don�t want to install Cortana on your phone or computer.
 
-### More Information
+To run the web control locally, copy voice-test.html, botchat.js, and botchat.css to your locally running web server, and open voice-test.html with the following key appended to the URL, as shown in this URL: http://students.washington.edu/dpm3/voice-test.html?s=tuBISJY4UhI.cwA.RlY.8fj5FJK_9yK6J4LB-JaaJAPdZVqQ9DB_jP6ysYn6DIo
 
-To get more information about how to get started in Bot Builder for Node please review the following resources:
-* [Bot Builder for Node.js Reference](https://docs.microsoft.com/en-us/bot-framework/nodejs/)
-* [SSML Language Reference](https://msdn.microsoft.com/en-us/library/hh378377(v=office.14).aspx)
+
+## Cortana Skill
+You can run the Cortana skill by saying “Ask Citizenship for a test” to Cortana on IPhone, Android, or Windows 10. You need to use a test account to log into Cortana on your device (see this link for a screenshot of the UI for changing your login) since the skill isn’t publicly available yet. The test account is username: chatbot.test@outlook.com password: CortanaTest
+
+To run this locally, you will need to have node.js installed. The main file is app.js. In the directory of app.js, run the following:
+
+npm init
+npm install --save botbuilder
+npm install --save restify
+node.js app.js
+
+This should start a web service locally. If successful your node.js prompt will show a message like:
+restify listening to http://[::]:3978
+
+To see a bot interacting with the service locally, you can download an emulator, described here: https://docs.microsoft.com/en-us/bot-framework/debug-bots-emulator

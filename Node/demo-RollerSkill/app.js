@@ -1,12 +1,60 @@
 /*-----------------------------------------------------------------------------
 This project is a Cortana skill for practicing for the US Naturalization exam. 
 -----------------------------------------------------------------------------*/
+const LUISClient = require("./luis_sdk");
+
+const APPID_nav = "13f573e0-8c13-45a3-86a2-b84b1c7b02e3";
+const APPID_19 = "2a7e6e0e-8199-4350-a6b7-9b2fe9ffc18a";
+const APPID_20 = "030e345e-aa6c-4e16-8399-fb718f30b898";
+const APPID_21 = "036b4521-11aa-494f-9920-77a243a87dea";
+const APPID_10 = "3ccae9a8-ba4d-4c88-8c3c-ff10cd43dbcf";
+const APPID_13 = "1ac8988a-7643-47c7-9b1d-d6e71eb7bd50";
+const APPKEY = "9823b75a8c9045f9bce7fee87a5e1fbc";
+
+var shuffle_on = 1; // set this to 0 to disable shuffling of question order
 
 var restify = require('restify');
 var builder = require('botbuilder');
 var sprintf = require("sprintf-js").sprintf;
 var util = require('util');
 var ssml = require('./ssml');
+
+// set up LUIS client for various answer models
+var LUISclient_nav = LUISClient({
+    appId: APPID_nav,
+    appKey: APPKEY,
+    verbose: true
+});
+
+var LUISclient19 = LUISClient({
+    appId: APPID_19,
+    appKey: APPKEY,
+    verbose: true
+});
+
+var LUISclient20 = LUISClient({
+    appId: APPID_20,
+    appKey: APPKEY,
+    verbose: true
+});
+
+var LUISclient21 = LUISClient({
+    appId: APPID_21,
+    appKey: APPKEY,
+    verbose: true
+});
+
+var LUISclient10 = LUISClient({
+    appId: APPID_10,
+    appKey: APPKEY,
+    verbose: true
+});
+
+var LUISclient13 = LUISClient({
+    appId: APPID_13,
+    appKey: APPKEY,
+    verbose: true
+});
 
 // Setup Restify Server
 var server = restify.createServer();
@@ -31,16 +79,6 @@ server.post('/api/messages', connector.listen());
 var bot = new builder.UniversalBot(connector, function (session) {
     // set up global data
 
-    // TODO: Move this to Help, to set once - in case it won't be persisted before call to set.
-    session.conversationData.questions = [
-        { question: 'What is the capital of the United States?', answer: 'Washington, D.C.' },
-        { question: 'Where is the Statue of Liberty?', answer: 'New York (Harbor) or Liberty Island' },
-        { question: 'Why does the flag have 50 stars?', answer: 'because there are 50 states' },
-        { question: 'When do we celebrate Independence Day?', answer: 'July 4' },
-        { question: 'What did Martin Luther King, Jr. do?', answer: 'He fought for civil rights and worked for equality for all Americans' },
-        { question: 'What is one right or freedom from the First Amendment?', answer: 'Secretary of State, Secretary of Labor' },
-        { question: 'What are two cabinet-level positions', answer: 'Secretary of State, Secretary of Labor' }
-    ];
     session.conversationData.turns = 0;
     // Just redirect to our 'HelpDialog'.
     session.replaceDialog('HelpDialog');
@@ -70,19 +108,6 @@ bot.dialog('CreateTestDialog', [
         var debug_qIndex = 0;
         var debug_flag = 0;
 
-        /*
-        if (session.message.text) {
-            if (session.message.text.match(/repeat test/i)) {
-                if (session.conversationData.test !== undefined && session.conversationData.test.turns !== undefined) {
-                    // we have already started a test before, so use previous number of questions and don't shuffle. Just reset current_question_index to 0.
-                    session.conversationData.test.current_question_index = 0;
-                    session.clearDialogStack();
-                    session.replaceDialog('AskQuestionDialog', { test: test });
-                    session.endDialog();
-                } // else the user got here but still has to initialize a first test, so just continue.
-            }
-        }
-        */
 
         var current_turns = 0;
         if (session.conversationData.test !== undefined && session.conversationData.test.turns !== undefined) {
@@ -105,11 +130,12 @@ bot.dialog('CreateTestDialog', [
 
         session.conversationData.questions = [
             // Questions for those over 65 who have lived in the states for over 20 years.
+            { question: 'What did Martin Luther King, Jr. do?', answer: 'He fought for civil rights and worked for equality for all Americans', qId: 5 },
             { question: 'What is the capital of the United States?', answer: 'Washington, D.C.', qId: 1 },
             { question: 'Where is the Statue of Liberty?', answer: 'New York (Harbor) or Liberty Island', qId: 2 },
             { question: 'Why does the flag have 50 stars?', answer: 'because there are 50 states', qId: 3 },  // often misheard as 450
             { question: 'When do we celebrate Independence Day?', answer: 'July 4', qId: 4 },
-            { question: 'What did Martin Luther King, Jr. do?', answer: 'He fought for civil rights and worked for equality for all Americans', qId: 5 }, // Intent recognizer
+            //{ question: 'What did Martin Luther King, Jr. do?', answer: 'He fought for civil rights and worked for equality for all Americans', qId: 5 }, // Intent recognizer
             { question: 'What is one right or freedom from the First Amendment?', answer: 'Any of: speech, religion, assembly, press, petition the government', qId: 6 },
             { question: 'What is the economic system in the United States?', answer: 'Either of: capitalist economy, market economy', qId: 7 },
             { question: 'Name one branch or part of the government.', answer: 'Any of: Congress, legislative, President, executive, the courts, judicial', qId: 8 },
@@ -125,12 +151,8 @@ bot.dialog('CreateTestDialog', [
             { question: 'Who was the first President?', answer: '(George) Washington', qId: 18 },
             { question: 'What was one important thing that Abraham Lincoln did?', answer: 'freed the slaves (Emancipation Proclamation), saved (or preserved) the Union, led the United States during the Civil War', qId: 19 }, // Use Intent recognizer
             { question: ' Name one war fought by the United States in the 1900s.', answer: 'World War I, World War II, Korean War, Vietnam War, (Persian) Gulf War', qId: 20 },  // List entity or phrase list
-            { question: 'What did Martin Luther King, Jr. do?', answer: 'fought for civil rights, worked for equality for all Americans', qId: 21 },  // Intent recognizer
+            { question: 'What did Martin Luther King, Jr. do?', answer: 'fought for civil rights, worked for equality for all Americans', qId: 21 }  // Intent recognizer
             /* { question: 'What does the President’s Cabinet do?', answer: 'advises the President', qId: 35 },
-            { question: '', answer: '', qId: 23 },
-            { question: '', answer: '', qId: 24 },
-            { question: '', answer: '', qId: 25 },
-            { question: '', answer: '', qId: 26 }, 
             { question: 'What are two cabinet-level positions', answer: 'Secretary of State, Secretary of Labor', qId: 36 }
             */
             // --- begin slightly harder questions
@@ -141,7 +163,11 @@ bot.dialog('CreateTestDialog', [
         /**
          * shuffle the questions
          */
-        session.conversationData.questions = shuffle(session.conversationData.questions);
+        if (shuffle_on) {
+            session.conversationData.questions = shuffle(session.conversationData.questions);
+        }
+
+
         /**
          * Ask for the difficulty level.
          * 
@@ -414,7 +440,7 @@ bot.dialog('AskQuestionDialog', [
             session.replaceDialog('AskQuestionDialog');
         }
     }
-]).triggerAction({ matches: /Next/i }); 
+]).triggerAction({ matches: /Next/i });
 
 
 
@@ -662,6 +688,26 @@ function judgeAnswer(qId, utterance) {
         case (10):
             console.log('judgeAnswer: qId ==10');
             if (utterance !== undefined && utterance !== null) {
+
+                var intentName = '';
+                LUISclient10.predict(utterance, {
+
+                    //On success of prediction
+                    onSuccess: function (response) {
+                        intentName = printOnSuccess(response); // returns top scoring intent name
+                    },
+
+                    //On failure of prediction
+                    onFailure: function (err) {
+                        console.log(err);
+                    }
+                });
+
+                // TODO: Need to handle this asynchronously.
+                if (intentName === 'CorrectAnswer') {
+                    console.log('LUIS qId10: CorrectAnswer');
+                    return 1;
+                }
                 console.log('judgeAnswer: utterance = %s', utterance);
                 var match = utterance.match(/\w*Murray\w*|\w*Cantwell\w*/i); // TODO Use LUIS model
                 if (match !== null) {
@@ -716,6 +762,27 @@ function judgeAnswer(qId, utterance) {
         case (13): // 'What is the capital of your state?'
             console.log('judgeAnswer: qId ==13');
             if (utterance !== undefined && utterance !== null) {
+
+                var intentName = '';
+                LUISclient13.predict(utterance, {
+
+                    //On success of prediction
+                    onSuccess: function (response) {
+                        intentName = printOnSuccess(response); // returns top scoring intent name
+                    },
+
+                    //On failure of prediction
+                    onFailure: function (err) {
+                        console.log(err);
+                    }
+                });
+
+                // TODO: Need to handle this asynchronously.
+                if (intentName === 'CorrectAnswer') {
+                    console.log('LUIS qId13: CorrectAnswer');
+                    return 1;
+                }
+
                 console.log('judgeAnswer: utterance = %s', utterance);
                 var match = utterance.match(/\w*Olympia\w*/i);
                 if (match !== null) {
@@ -829,16 +896,38 @@ function judgeAnswer(qId, utterance) {
         case (19): // What was one important thing that Abraham Lincoln did?
             console.log('judgeAnswer: qId ==19');
             if (utterance !== undefined && utterance !== null) {
+
+                var intentName = '';
+                LUISclient19.predict(utterance, {
+
+                    //On success of prediction
+                    onSuccess: function (response) {
+                        intentName = printOnSuccess(response); // returns top scoring intent name
+                    },
+
+                    //On failure of prediction
+                    onFailure: function (err) {
+                        console.error(err);
+                    }
+                });
+
+                // TODO: Need to handle this asynchronously.
+                if (intentName === 'CorrectAnswer') {
+                    console.log('LUIS qId19: CorrectAnswer');
+                    return 1;
+                }
+
+
                 console.log('judgeAnswer: utterance = %s', utterance);
                 var match = utterance.match(/\w*(save|preserve).*(union|country|nation)\w*|\w*emancipation proclamation\w*|(free|emancipate|liberate).*slave*\w*|(end|abolish).*slavery\w*/i);
                 if (match !== null) {
                     score = 1;
-                    return score;
                 } else {
                     score = 0;
                     console.log('judgeAnswer: Didn\'t match utterance = %s', utterance);
-                    return score;
+                    // return score;
                 }
+
             } else {
                 console.log("null utterance for qId=19");
             }
@@ -850,6 +939,27 @@ function judgeAnswer(qId, utterance) {
              */
             console.log('judgeAnswer: qId ==20');
             if (utterance !== undefined && utterance !== null) {
+
+                var intentName = '';
+                LUISclient20.predict(utterance, {
+
+                    //On success of prediction
+                    onSuccess: function (response) {
+                        intentName = printOnSuccess(response); // returns top scoring intent name
+                    },
+
+                    //On failure of prediction
+                    onFailure: function (err) {
+                        console.log(err);
+                    }
+                });
+
+                // TODO: Need to handle this asynchronously.
+                if (intentName === 'CorrectAnswer') {
+                    console.log('LUIS qId20: CorrectAnswer');
+                    return 1;
+                }
+
                 console.log('judgeAnswer: utterance = %s', utterance);
                 var match = utterance.match(/\w*(world war|ww)\s*((I|1|one)|(II|2|two))\w*|\w*korea\w*|\w*vietnam\w*|\w*(persian|gulf|iraq).*/i);
                 if (match !== null) {
@@ -903,6 +1013,16 @@ function shuffle(array) {
 
 
 bot.endConversationAction('goodbyeAction', "Ok... See you later.", { matches: /Goodbye/i });
+
+var printOnSuccess = function (response) {
+    console.log("Query: " + response.query);
+    console.log("Top Intent: " + response.topScoringIntent.intent);
+    console.log("Entities:");
+    for (var i = 1; i <= response.entities.length; i++) {
+        console.log(i + "- " + response.entities[i - 1].entity);
+    }
+    return response.topScoringIntent.intent;
+};
 
 /**
  * Listen for a debug string in the form of debug question-index.
