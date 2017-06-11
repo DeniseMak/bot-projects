@@ -511,12 +511,12 @@ function judgeAnswer(qId, utterance) {
             console.log('judgeAnswer: qId ==1');
             if (utterance !== undefined && utterance !== null) {
                 console.log('judgeAnswer: utterance = %s', utterance);
-                var match = utterance.match(/\w*(Washington).+(D\.*\s*C\.*|District of Columbia)\w*/i);
+                var match = utterance.match(/.*(Washington).+(D\.*\s*C\.*|District of Columbia).*/i);
                 if (match !== null) {
                     score = 1;
                     return score;
                 } else {
-                    if (utterance.match(/\w*(Washington)\w*/i) || utterance.match(/D\.*\s*C\.*|District\s*\w*\s*(Columbia)\w*/i)) {
+                    if (utterance.match(/.*(Washington).*/i) || utterance.match(/D\.*\s*C\.*|District\s*.*\s*(Columbia).*/i)) {
                         score = 0.5;
                         console.log('judgeAnswer: partial match on utterance=%s', utterance);
                         return score;
@@ -540,7 +540,7 @@ function judgeAnswer(qId, utterance) {
             console.log('judgeAnswer: qId ==2');
             if (utterance !== undefined && utterance !== null) {
                 console.log('judgeAnswer: utterance = %s', utterance);
-                var match = utterance.match(/\w*New York(\s+\(?Harbor\)?)?|.*(Liberty Island)\w*/i);
+                var match = utterance.match(/.*New York(\s+\(?Harbor\)?)?|.*(Liberty Island).*/i);
                 if (match !== null) {
                     score = 1;
                     return score;
@@ -557,7 +557,7 @@ function judgeAnswer(qId, utterance) {
             console.log('judgeAnswer: qId ==3'); // 50 states
             if (utterance !== undefined && utterance !== null) {
                 console.log('judgeAnswer: utterance = %s', utterance);
-                var match = utterance.match(/\w*50 state\w*|\w*(each|every|all)\s+\w*\s+state\w*/i); // try LUIS
+                var match = utterance.match(/.*50 state.*|.*(for|each|every|all)\s+.*\s+state.*/i); // try LUIS
                 if (match !== null) {
                     score = 1;
                     return score;
@@ -575,7 +575,7 @@ function judgeAnswer(qId, utterance) {
             console.log('judgeAnswer: qId ==4'); // Independence day - entities
             if (utterance !== undefined && utterance !== null) {
                 console.log('judgeAnswer: utterance = %s', utterance);
-                var match = utterance.match(/\w*July 4(th)?\w*|\w*7\/4\w*/i); // try LUIS
+                var match = utterance.match(/.*July 4(th)?.*|.*7\/4.*/i); // try LUIS
                 if (match !== null) {
                     score = 1;
                     return score;
@@ -611,7 +611,7 @@ function judgeAnswer(qId, utterance) {
             console.log('judgeAnswer: qId ==6'); // one right or freedom from 1st Amendment
             if (utterance !== undefined && utterance !== null) {
                 console.log('judgeAnswer: utterance = %s', utterance);
-                var match = utterance.match(/\w*(speech|expression)\w*|\w*religion\w*|\w*(assemble|assembly)\w*|\w*press\w*|\w*petition.+government\w*/i); // try LUIS
+                var match = utterance.match(/.*(speech|expression).*|.*religion.*|.*(assemble|assembly).*|.*press.*|.*petition.+government.*/i); // try LUIS
                 if (match !== null) {
                     score = 1;
                     return score;
@@ -629,7 +629,7 @@ function judgeAnswer(qId, utterance) {
             console.log('judgeAnswer: qId ==7');
             if (utterance !== undefined && utterance !== null) {
                 console.log('judgeAnswer: utterance = %s', utterance);
-                var match = utterance.match(/\w*(capitalist|capitalism)\w*|\w*market\w*/i); // try LUIS
+                var match = utterance.match(/.*(capitalist|capitalism).*|.*market.*/i); // try LUIS
                 if (match !== null) {
                     score = 1;
                     return score;
@@ -648,7 +648,7 @@ function judgeAnswer(qId, utterance) {
             console.log('judgeAnswer: qId ==8');
             if (utterance !== undefined && utterance !== null) {
                 console.log('judgeAnswer: utterance = %s', utterance);
-                var match = utterance.match(/\w*congress\w*|\w*legislative\w*|\w*president\w*|\w*executive\w*|\w*courts\w*|/i);
+                var match = utterance.match(/.*congress.*|.*legislative.*|.*president.*|.*executive.*|.*courts.*|/i);
                 if (match !== null) {
                     score = 1;
                     return score;
@@ -667,7 +667,7 @@ function judgeAnswer(qId, utterance) {
             console.log('judgeAnswer: qId ==9');
             if (utterance !== undefined && utterance !== null) {
                 console.log('judgeAnswer: utterance = %s', utterance);
-                var match = utterance.match(/\w*Senate\w*|\w*House( of Representatives)?\w*/i);
+                var match = utterance.match(/.*Senate.*|.*House( of Representatives)?.*/i);
                 if (match !== null) {
                     score = 1;
                     return score;
@@ -689,6 +689,7 @@ function judgeAnswer(qId, utterance) {
             console.log('judgeAnswer: qId ==10');
             if (utterance !== undefined && utterance !== null) {
 
+                /*
                 var intentName = '';
                 LUISclient10.predict(utterance, {
 
@@ -708,8 +709,9 @@ function judgeAnswer(qId, utterance) {
                     console.log('LUIS qId10: CorrectAnswer');
                     return 1;
                 }
+                */
                 console.log('judgeAnswer: utterance = %s', utterance);
-                var match = utterance.match(/\w*Murray\w*|\w*Cantwell\w*/i); // TODO Use LUIS model
+                var match = utterance.match(/.*Murray.*|.*Cantwell.*/i); // TODO Use LUIS model
                 if (match !== null) {
                     score = 1;
                     return score;
@@ -727,7 +729,7 @@ function judgeAnswer(qId, utterance) {
             console.log('judgeAnswer: qId ==11');
             if (utterance !== undefined && utterance !== null) {
                 console.log('judgeAnswer: utterance = %s', utterance);
-                var match = utterance.match(/\w*November\w*|\w*nov\w*/i);
+                var match = utterance.match(/.*November.*|.*nov.*/i);
                 if (match !== null) {
                     score = 1;
                     return score;
@@ -745,7 +747,7 @@ function judgeAnswer(qId, utterance) {
             console.log('judgeAnswer: qId ==12');
             if (utterance !== undefined && utterance !== null) {
                 console.log('judgeAnswer: utterance = %s', utterance);
-                var match = utterance.match(/\w*Trump\w*|\w*Donald Trump\w*|\w*Donald J(\.)? Trump\w*/i);
+                var match = utterance.match(/.*Trump.*|.*Donald Trump.*|.*Donald J(\.)? Trump.*/i);
                 if (match !== null) {
                     score = 1;
                     return score;
@@ -763,7 +765,9 @@ function judgeAnswer(qId, utterance) {
             console.log('judgeAnswer: qId ==13');
             if (utterance !== undefined && utterance !== null) {
 
+                /*
                 var intentName = '';
+                
                 LUISclient13.predict(utterance, {
 
                     //On success of prediction
@@ -782,9 +786,10 @@ function judgeAnswer(qId, utterance) {
                     console.log('LUIS qId13: CorrectAnswer');
                     return 1;
                 }
+                */
 
                 console.log('judgeAnswer: utterance = %s', utterance);
-                var match = utterance.match(/\w*Olympia\w*/i);
+                var match = utterance.match(/.*Olympia.*/i);
                 if (match !== null) {
                     score = 1;
                     return score;
@@ -802,7 +807,7 @@ function judgeAnswer(qId, utterance) {
             console.log('judgeAnswer: qId ==14');
             if (utterance !== undefined && utterance !== null) {
                 console.log('judgeAnswer: utterance = %s', utterance);
-                var match = utterance.match(/\w*Democrat.+Republican\w*|\w*Republican.+Democrat\w*/i);
+                var match = utterance.match(/.*Democrat.+Republican.*|.*Republican.+Democrat.*/i);
                 if (match !== null) {
                     score = 1;
                     return score;
@@ -820,7 +825,7 @@ function judgeAnswer(qId, utterance) {
             console.log('judgeAnswer: qId ==15');
             if (utterance !== undefined && utterance !== null) {
                 console.log('judgeAnswer: utterance = %s', utterance);
-                var match = utterance.match(/\w*jury\w*|\w*vote\w*/i);
+                var match = utterance.match(/.*jury.*|.*(vote|voting).*/i);
                 if (match !== null) {
                     score = 1;
                     return score;
@@ -838,7 +843,7 @@ function judgeAnswer(qId, utterance) {
             console.log('judgeAnswer: qId ==16');
             if (utterance !== undefined && utterance !== null) {
                 console.log('judgeAnswer: utterance = %s', utterance);
-                var match = utterance.match(/\w*eighteen\w*|\w*18\w*/i);
+                var match = utterance.match(/.*eighteen.*|.*18.*/i);
                 if (match !== null) {
                     score = 1;
                     return score;
@@ -856,7 +861,7 @@ function judgeAnswer(qId, utterance) {
             console.log('judgeAnswer: qId ==17');
             if (utterance !== undefined && utterance !== null) {
                 console.log('judgeAnswer: utterance = %s', utterance);
-                var match = utterance.match(/\w*April fifteen\w*|\w*April 15\w*|\w*4-15\w*|\w*4\/15\w*|\w*15.*Apr\w*/i);
+                var match = utterance.match(/.*April fifteen.*|.*April 15.*|.*4-15.*|.*4\/15.*|.*15.*Apr.*/i);
                 if (match !== null) {
                     score = 1;
                     return score;
@@ -874,7 +879,7 @@ function judgeAnswer(qId, utterance) {
             console.log('judgeAnswer: qId ==18');
             if (utterance !== undefined && utterance !== null) {
                 console.log('judgeAnswer: utterance = %s', utterance);
-                var match = utterance.match(/\w*(George )?Washington\w*/i);
+                var match = utterance.match(/.*(George )?Washington.*/i);
                 if (match !== null) {
                     score = 1;
                     return score;
@@ -919,7 +924,7 @@ function judgeAnswer(qId, utterance) {
 
 
                 console.log('judgeAnswer: utterance = %s', utterance);
-                var match = utterance.match(/\w*(save|preserve).*(union|country|nation)\w*|\w*emancipation proclamation\w*|(free|emancipate|liberate).*slave*\w*|(end|abolish).*slavery\w*/i);
+                var match = utterance.match(/.*(save|preserve).*(union|country|nation).*|.*emancipation proclamation.*|(free|emancipate|liberate).*slave*.*|(end|abolish).*slavery.*/i);
                 if (match !== null) {
                     score = 1;
                 } else {
@@ -940,6 +945,7 @@ function judgeAnswer(qId, utterance) {
             console.log('judgeAnswer: qId ==20');
             if (utterance !== undefined && utterance !== null) {
 
+                /*
                 var intentName = '';
                 LUISclient20.predict(utterance, {
 
@@ -959,9 +965,9 @@ function judgeAnswer(qId, utterance) {
                     console.log('LUIS qId20: CorrectAnswer');
                     return 1;
                 }
-
+                */
                 console.log('judgeAnswer: utterance = %s', utterance);
-                var match = utterance.match(/\w*(world war|ww)\s*((I|1|one)|(II|2|two))\w*|\w*korea\w*|\w*vietnam\w*|\w*(persian|gulf|iraq).*/i);
+                var match = utterance.match(/.*(world war|ww)\s*((I|1|one)|(II|2|two)).*|.*korea.*|.*vietnam.*|.*(persian|gulf|iraq).*/i);
                 if (match !== null) {
                     score = 1;
                     return score;
