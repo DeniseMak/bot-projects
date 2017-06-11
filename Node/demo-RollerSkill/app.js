@@ -593,7 +593,7 @@ function judgeAnswer(qId, utterance) {
             console.log('judgeAnswer: qId ==5'); // MLK intent
             if (utterance !== undefined && utterance !== null) {
                 console.log('judgeAnswer: utterance = %s', utterance);
-                var match = utterance.match(/\w*civil right\w*|\w*equality\w*/i); // try LUIS
+                var match = utterance.match(/.*civil right.*|.*equality.*/i); // try LUIS
                 if (match !== null) {
                     score = 1;
                     return score;
