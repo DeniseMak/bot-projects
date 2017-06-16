@@ -14,11 +14,11 @@ const APPKEY = "9823b75a8c9045f9bce7fee87a5e1fbc";
 // Turn this on to crash the bot 
 // We use this to try out what the behavior is in Cortana
 // and on Azure when the bot crashes.
-const GENERATE_ERR = 1; 
+const GENERATE_ERR = 0; 
 
 // To debug a question: shuffle_on is set 0 to disable shuffling of question order,
 // and put the questions first in the questions array in CreateTestDialog.
-const DEBUG = 1;
+const DEBUG = 0;
 var shuffle_on = 1;
 if (DEBUG) {
     shuffle_on = 0;
