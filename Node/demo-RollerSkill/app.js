@@ -1,15 +1,7 @@
 /*-----------------------------------------------------------------------------
 This project is a Cortana skill for practicing for the US Naturalization exam. 
 -----------------------------------------------------------------------------*/
-const LUISClient = require("./luis_sdk");
 
-const APPID_nav = "13f573e0-8c13-45a3-86a2-b84b1c7b02e3";
-const APPID_19 = "2a7e6e0e-8199-4350-a6b7-9b2fe9ffc18a";
-const APPID_20 = "030e345e-aa6c-4e16-8399-fb718f30b898";
-const APPID_21 = "036b4521-11aa-494f-9920-77a243a87dea";
-const APPID_10 = "3ccae9a8-ba4d-4c88-8c3c-ff10cd43dbcf";
-const APPID_13 = "1ac8988a-7643-47c7-9b1d-d6e71eb7bd50";
-const APPKEY = "9823b75a8c9045f9bce7fee87a5e1fbc";
 
 // Turn this on to crash the bot 
 // We use this to try out what the behavior is in Cortana
@@ -23,6 +15,17 @@ var shuffle_on = 1;
 if (DEBUG) {
     shuffle_on = 0;
 } 
+
+const INIT_IN_DEFAULT = 1;
+const LUISClient = require("./luis_sdk");
+
+const APPID_nav = "13f573e0-8c13-45a3-86a2-b84b1c7b02e3";
+const APPID_19 = "2a7e6e0e-8199-4350-a6b7-9b2fe9ffc18a";
+const APPID_20 = "030e345e-aa6c-4e16-8399-fb718f30b898";
+const APPID_21 = "036b4521-11aa-494f-9920-77a243a87dea";
+const APPID_10 = "3ccae9a8-ba4d-4c88-8c3c-ff10cd43dbcf";
+const APPID_13 = "1ac8988a-7643-47c7-9b1d-d6e71eb7bd50";
+const APPKEY = "9823b75a8c9045f9bce7fee87a5e1fbc";
 
 var restify = require('restify');
 var builder = require('botbuilder');
@@ -97,6 +100,41 @@ var bot = new builder.UniversalBot(connector, function (session) {
     // BUGBUG -- because did not call bot.set yet, it doesn't make sense to do anything with session.conversationData below, because it will be lost.
     // Workaround -- make this privateConversationData.
     session.privateConversationData.turns = 0;
+    if (INIT_IN_DEFAULT) {
+        session.privateConversationData.questions = [
+            // Questions for those over 65 who have lived in the states for over 20 years.
+            { question: 'Who was the first President?', answer: '(George) Washington', qId: 18 },
+            { question: 'What was one important thing that Abraham Lincoln did?', answer: 'freed the slaves (Emancipation Proclamation), saved (or preserved) the Union, led the United States during the Civil War', qId: 19 }, 
+            { question: 'What did Martin Luther King, Jr. do?', answer: 'He fought for civil rights and worked for equality for all Americans', qId: 5 },
+            { question: 'What is the capital of the United States?', answer: 'Washington, D.C.', qId: 1 },
+            { question: 'Where is the Statue of Liberty?', answer: 'New York (Harbor) or Liberty Island', qId: 2 },
+            { question: 'Why does the flag have 50 stars?', answer: 'because there are 50 states', qId: 3 },  // often misheard as 450
+            { question: 'When do we celebrate Independence Day?', answer: 'July 4', qId: 4 },
+            //{ question: 'What did Martin Luther King, Jr. do?', answer: 'He fought for civil rights and worked for equality for all Americans', qId: 5 }, // Intent recognizer
+            { question: 'What is one right or freedom from the First Amendment?', answer: 'Any of: speech, religion, assembly, press, petition the government', qId: 6 },
+            { question: 'What is the economic system in the United States?', answer: 'Either of: capitalist economy, market economy', qId: 7 },
+            { question: 'Name one branch or part of the government.', answer: 'Any of: Congress, legislative, President, executive, the courts, judicial', qId: 8 },
+            { question: 'What are the two parts of the U.S. Congress?', answer: 'the Senate and House (of Representatives)', qId: 9 },
+            { question: 'Who is one of your state’s U.S. Senators now?', answer: 'varies depending on your state. See https://en.wikipedia.org/wiki/List_of_current_United_States_Senators', qId: 10 }, // Use list entity recognizer
+            { question: 'In what month do we vote for President?', answer: 'November', qId: 11 },
+            { question: 'What is the name of the President of the United States now?', answer: 'Any of: Donald J. Trump, Donald Trump, Trump', qId: 12 },
+            { question: 'What is the capital of your state?', answer: '', qId: 13 }, // Use list entity recognizer
+            { question: 'What are the two major political parties in the United States?', answer: 'Democratic and Republican', qId: 14 },
+            { question: 'What is one responsibility that is only for United States citizens?', answer: 'serve on a jury, or vote in a federal election', qId: 15 },
+            { question: 'How old do citizens have to be to vote for President?', answer: 'eighteen (18) and older', qId: 16 },
+            { question: 'When is the last day you can send in federal income tax forms?', answer: 'April 15', qId: 17 },
+            // { question: 'Who was the first President?', answer: '(George) Washington', qId: 18 },
+            //{ question: 'What was one important thing that Abraham Lincoln did?', answer: 'freed the slaves (Emancipation Proclamation), saved (or preserved) the Union, led the United States during the Civil War', qId: 19 }, // Use Intent recognizer
+            { question: ' Name one war fought by the United States in the 1900s.', answer: 'World War I, World War II, Korean War, Vietnam War, (Persian) Gulf War', qId: 20 },  // List entity or phrase list
+            { question: 'What did Martin Luther King, Jr. do?', answer: 'fought for civil rights, worked for equality for all Americans', qId: 21 }  // Intent recognizer
+            /* { question: 'What does the President’s Cabinet do?', answer: 'advises the President', qId: 35 },
+            { question: 'What are two cabinet-level positions', answer: 'Secretary of State, Secretary of Labor', qId: 36 }
+            */
+            // --- begin slightly harder questions
+
+        ];
+    }
+
     // Just redirect to our 'HelpDialog'.
     session.replaceDialog('HelpDialog');
 });
@@ -142,39 +180,40 @@ bot.dialog('CreateTestDialog', [
             score: 0
         };
 
-        session.privateConversationData.questions = [
-            // Questions for those over 65 who have lived in the states for over 20 years.
-            { question: 'Who was the first President?', answer: '(George) Washington', qId: 18 },
-            { question: 'What was one important thing that Abraham Lincoln did?', answer: 'freed the slaves (Emancipation Proclamation), saved (or preserved) the Union, led the United States during the Civil War', qId: 19 }, 
-            { question: 'What did Martin Luther King, Jr. do?', answer: 'He fought for civil rights and worked for equality for all Americans', qId: 5 },
-            { question: 'What is the capital of the United States?', answer: 'Washington, D.C.', qId: 1 },
-            { question: 'Where is the Statue of Liberty?', answer: 'New York (Harbor) or Liberty Island', qId: 2 },
-            { question: 'Why does the flag have 50 stars?', answer: 'because there are 50 states', qId: 3 },  // often misheard as 450
-            { question: 'When do we celebrate Independence Day?', answer: 'July 4', qId: 4 },
-            //{ question: 'What did Martin Luther King, Jr. do?', answer: 'He fought for civil rights and worked for equality for all Americans', qId: 5 }, // Intent recognizer
-            { question: 'What is one right or freedom from the First Amendment?', answer: 'Any of: speech, religion, assembly, press, petition the government', qId: 6 },
-            { question: 'What is the economic system in the United States?', answer: 'Either of: capitalist economy, market economy', qId: 7 },
-            { question: 'Name one branch or part of the government.', answer: 'Any of: Congress, legislative, President, executive, the courts, judicial', qId: 8 },
-            { question: 'What are the two parts of the U.S. Congress?', answer: 'the Senate and House (of Representatives)', qId: 9 },
-            { question: 'Who is one of your state’s U.S. Senators now?', answer: 'varies depending on your state. See https://en.wikipedia.org/wiki/List_of_current_United_States_Senators', qId: 10 }, // Use list entity recognizer
-            { question: 'In what month do we vote for President?', answer: 'November', qId: 11 },
-            { question: 'What is the name of the President of the United States now?', answer: 'Any of: Donald J. Trump, Donald Trump, Trump', qId: 12 },
-            { question: 'What is the capital of your state?', answer: '', qId: 13 }, // Use list entity recognizer
-            { question: 'What are the two major political parties in the United States?', answer: 'Democratic and Republican', qId: 14 },
-            { question: 'What is one responsibility that is only for United States citizens?', answer: 'serve on a jury, or vote in a federal election', qId: 15 },
-            { question: 'How old do citizens have to be to vote for President?', answer: 'eighteen (18) and older', qId: 16 },
-            { question: 'When is the last day you can send in federal income tax forms?', answer: 'April 15', qId: 17 },
-            // { question: 'Who was the first President?', answer: '(George) Washington', qId: 18 },
-            //{ question: 'What was one important thing that Abraham Lincoln did?', answer: 'freed the slaves (Emancipation Proclamation), saved (or preserved) the Union, led the United States during the Civil War', qId: 19 }, // Use Intent recognizer
-            { question: ' Name one war fought by the United States in the 1900s.', answer: 'World War I, World War II, Korean War, Vietnam War, (Persian) Gulf War', qId: 20 },  // List entity or phrase list
-            { question: 'What did Martin Luther King, Jr. do?', answer: 'fought for civil rights, worked for equality for all Americans', qId: 21 }  // Intent recognizer
-            /* { question: 'What does the President’s Cabinet do?', answer: 'advises the President', qId: 35 },
-            { question: 'What are two cabinet-level positions', answer: 'Secretary of State, Secretary of Labor', qId: 36 }
-            */
-            // --- begin slightly harder questions
+        if (!INIT_IN_DEFAULT) {
+            session.privateConversationData.questions = [
+                // Questions for those over 65 who have lived in the states for over 20 years.
+                { question: 'Who was the first President?', answer: '(George) Washington', qId: 18 },
+                { question: 'What was one important thing that Abraham Lincoln did?', answer: 'freed the slaves (Emancipation Proclamation), saved (or preserved) the Union, led the United States during the Civil War', qId: 19 },
+                { question: 'What did Martin Luther King, Jr. do?', answer: 'He fought for civil rights and worked for equality for all Americans', qId: 5 },
+                { question: 'What is the capital of the United States?', answer: 'Washington, D.C.', qId: 1 },
+                { question: 'Where is the Statue of Liberty?', answer: 'New York (Harbor) or Liberty Island', qId: 2 },
+                { question: 'Why does the flag have 50 stars?', answer: 'because there are 50 states', qId: 3 },  // often misheard as 450
+                { question: 'When do we celebrate Independence Day?', answer: 'July 4', qId: 4 },
+                //{ question: 'What did Martin Luther King, Jr. do?', answer: 'He fought for civil rights and worked for equality for all Americans', qId: 5 }, // Intent recognizer
+                { question: 'What is one right or freedom from the First Amendment?', answer: 'Any of: speech, religion, assembly, press, petition the government', qId: 6 },
+                { question: 'What is the economic system in the United States?', answer: 'Either of: capitalist economy, market economy', qId: 7 },
+                { question: 'Name one branch or part of the government.', answer: 'Any of: Congress, legislative, President, executive, the courts, judicial', qId: 8 },
+                { question: 'What are the two parts of the U.S. Congress?', answer: 'the Senate and House (of Representatives)', qId: 9 },
+                { question: 'Who is one of your state’s U.S. Senators now?', answer: 'varies depending on your state. See https://en.wikipedia.org/wiki/List_of_current_United_States_Senators', qId: 10 }, // Use list entity recognizer
+                { question: 'In what month do we vote for President?', answer: 'November', qId: 11 },
+                { question: 'What is the name of the President of the United States now?', answer: 'Any of: Donald J. Trump, Donald Trump, Trump', qId: 12 },
+                { question: 'What is the capital of your state?', answer: '', qId: 13 }, // Use list entity recognizer
+                { question: 'What are the two major political parties in the United States?', answer: 'Democratic and Republican', qId: 14 },
+                { question: 'What is one responsibility that is only for United States citizens?', answer: 'serve on a jury, or vote in a federal election', qId: 15 },
+                { question: 'How old do citizens have to be to vote for President?', answer: 'eighteen (18) and older', qId: 16 },
+                { question: 'When is the last day you can send in federal income tax forms?', answer: 'April 15', qId: 17 },
+                // { question: 'Who was the first President?', answer: '(George) Washington', qId: 18 },
+                //{ question: 'What was one important thing that Abraham Lincoln did?', answer: 'freed the slaves (Emancipation Proclamation), saved (or preserved) the Union, led the United States during the Civil War', qId: 19 }, // Use Intent recognizer
+                { question: ' Name one war fought by the United States in the 1900s.', answer: 'World War I, World War II, Korean War, Vietnam War, (Persian) Gulf War', qId: 20 },  // List entity or phrase list
+                { question: 'What did Martin Luther King, Jr. do?', answer: 'fought for civil rights, worked for equality for all Americans', qId: 21 }  // Intent recognizer
+                /* { question: 'What does the President’s Cabinet do?', answer: 'advises the President', qId: 35 },
+                { question: 'What are two cabinet-level positions', answer: 'Secretary of State, Secretary of Labor', qId: 36 }
+                */
+                // --- begin slightly harder questions
 
-        ];
-
+            ];
+        }
         session.dialogData.test = test;  // TODO: Not using dialogdata anymore
 
 
