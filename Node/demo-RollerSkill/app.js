@@ -11,7 +11,14 @@ const APPID_10 = "3ccae9a8-ba4d-4c88-8c3c-ff10cd43dbcf";
 const APPID_13 = "1ac8988a-7643-47c7-9b1d-d6e71eb7bd50";
 const APPKEY = "9823b75a8c9045f9bce7fee87a5e1fbc";
 
-var shuffle_on = 1; // set this to 0 to disable shuffling of question order
+
+// To debug a question: shuffle_on is set 0 to disable shuffling of question order,
+// and put the questions first in the questions array in CreateTestDialog.
+const DEBUG = 1;
+var shuffle_on = 1;
+if (DEBUG) {
+    shuffle_on = 0;
+} 
 
 var restify = require('restify');
 var builder = require('botbuilder');
@@ -89,8 +96,10 @@ bot.set('persistConversationData', true);
 
 /**
  * This dialog sets up a test for the bot to administer.  It will 
- * ask the user for the difficulty level. The difficulty level can include:
- *   -- Whether or not text is displayed in English and/or their native language (only supporting Chinese now)
+ * ask the user for the difficulty level. 
+ * The difficulty level is currently not used, but could eventually include:
+ *   -- choosing from a harder set of questions
+ *   -- Whether or not text is displayed in English and/or their native language 
  *   -- Speed at which prompts are read to the user.
  * Once it's built up the test structure
  * it will pass it to a separate 'TakeTestDialog'.
@@ -128,8 +137,10 @@ bot.dialog('CreateTestDialog', [
 
         session.dialogData.test = test;  // TODO: Not using dialogdata anymore
 
+        /* TODO: MOVE TO DEFAULT DIALOG */
         session.conversationData.questions = [
             // Questions for those over 65 who have lived in the states for over 20 years.
+            { question: 'What was one important thing that Abraham Lincoln did?', answer: 'freed the slaves (Emancipation Proclamation), saved (or preserved) the Union, led the United States during the Civil War', qId: 19 }, 
             { question: 'What did Martin Luther King, Jr. do?', answer: 'He fought for civil rights and worked for equality for all Americans', qId: 5 },
             { question: 'What is the capital of the United States?', answer: 'Washington, D.C.', qId: 1 },
             { question: 'Where is the Statue of Liberty?', answer: 'New York (Harbor) or Liberty Island', qId: 2 },
@@ -149,7 +160,7 @@ bot.dialog('CreateTestDialog', [
             { question: 'How old do citizens have to be to vote for President?', answer: 'eighteen (18) and older', qId: 16 },
             { question: 'When is the last day you can send in federal income tax forms?', answer: 'April 15', qId: 17 },
             { question: 'Who was the first President?', answer: '(George) Washington', qId: 18 },
-            { question: 'What was one important thing that Abraham Lincoln did?', answer: 'freed the slaves (Emancipation Proclamation), saved (or preserved) the Union, led the United States during the Civil War', qId: 19 }, // Use Intent recognizer
+            //{ question: 'What was one important thing that Abraham Lincoln did?', answer: 'freed the slaves (Emancipation Proclamation), saved (or preserved) the Union, led the United States during the Civil War', qId: 19 }, // Use Intent recognizer
             { question: ' Name one war fought by the United States in the 1900s.', answer: 'World War I, World War II, Korean War, Vietnam War, (Persian) Gulf War', qId: 20 },  // List entity or phrase list
             { question: 'What did Martin Luther King, Jr. do?', answer: 'fought for civil rights, worked for equality for all Americans', qId: 21 }  // Intent recognizer
             /* { question: 'What does the President’s Cabinet do?', answer: 'advises the President', qId: 35 },
