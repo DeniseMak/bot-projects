@@ -11,6 +11,10 @@ const APPID_10 = "3ccae9a8-ba4d-4c88-8c3c-ff10cd43dbcf";
 const APPID_13 = "1ac8988a-7643-47c7-9b1d-d6e71eb7bd50";
 const APPKEY = "9823b75a8c9045f9bce7fee87a5e1fbc";
 
+// Turn this on to crash the bot 
+// We use this to try out what the behavior is in Cortana
+// and on Azure when the bot crashes.
+const GENERATE_ERR = 1; 
 
 // To debug a question: shuffle_on is set 0 to disable shuffling of question order,
 // and put the questions first in the questions array in CreateTestDialog.
@@ -84,60 +88,8 @@ server.post('/api/messages', connector.listen());
  *   recognized.
  */
 var bot = new builder.UniversalBot(connector, function (session) {
-    // set up global data
-
-    session.conversationData.turns = 0;
-    // Just redirect to our 'HelpDialog'.
-    session.replaceDialog('HelpDialog');
-});
-
-// Enable Conversation Data persistence
-bot.set('persistConversationData', true);
-
-/**
- * This dialog sets up a test for the bot to administer.  It will 
- * ask the user for the difficulty level. 
- * The difficulty level is currently not used, but could eventually include:
- *   -- choosing from a harder set of questions
- *   -- Whether or not text is displayed in English and/or their native language 
- *   -- Speed at which prompts are read to the user.
- * Once it's built up the test structure
- * it will pass it to a separate 'TakeTestDialog'.
- * 
- * We've added a triggerAction() to this dialog that lets a user say
- * something like "I'd like to take a test" to start the dialog.
- * We're using a RegEx to match the users input but we could just as 
- * easily use a LUIS intent.
- */
-bot.dialog('CreateTestDialog', [
-    function (session, args) {
-        // Initialize quiz structure.
-        // - conversationData gives us storage of data in between
-        //   turns with the user.
-        var debug_qIndex = 0;
-        var debug_flag = 0;
-
-
-        var current_turns = 0;
-        if (session.conversationData.test !== undefined && session.conversationData.test.turns !== undefined) {
-            current_turns = session.conversationData.test.turns;
-        }
-        var test = session.conversationData.test = {
-            type: 'custom',
-            level: null,
-            count: null, // total number of questions the user wants to do.
-            questions_picked: {},
-            current_question_index: 0,
-            turns: current_turns,
-            num_questions: 0,
-            score: 0
-        };
-
-
-
-        session.dialogData.test = test;  // TODO: Not using dialogdata anymore
-
-        /* TODO: MOVE TO DEFAULT DIALOG */
+    
+        // set up global data
         session.conversationData.questions = [
             // Questions for those over 65 who have lived in the states for over 20 years.
             { question: 'Who was the first President?', answer: '(George) Washington', qId: 18 },
@@ -170,6 +122,57 @@ bot.dialog('CreateTestDialog', [
             // --- begin slightly harder questions
 
         ];
+    session.conversationData.turns = 0;
+    // Just redirect to our 'HelpDialog'.
+    session.replaceDialog('HelpDialog');
+});
+
+// Enable Conversation Data persistence
+bot.set('persistConversationData', true);
+
+/**
+ * This dialog sets up a test for the bot to administer.  It will 
+ * ask the user for the difficulty level. 
+ * The difficulty level is currently not used, but could eventually include:
+ *   -- choosing from a harder set of questions
+ *   -- Whether or not text is displayed in English and/or their native language 
+ *   -- Speed at which prompts are read to the user.
+ * Once it's built up the test structure
+ * it will pass it to a separate 'TakeTestDialog'.
+ * 
+ * We've added a triggerAction() to this dialog that lets a user say
+ * something like "I'd like to take a test" to start the dialog.
+ * We're using a RegEx to match the users input but we could just as 
+ * easily use a LUIS intent.
+ */
+bot.dialog('CreateTestDialog', [
+    function (session, args) {
+        // Initialize quiz structure.
+        // - conversationData gives us storage of data in between
+        //   turns with the user.
+        var debug_qIndex = 0;
+        var debug_flag = 0;
+
+        var current_turns = 0;
+        if (session.conversationData.test !== undefined && session.conversationData.test.turns !== undefined) {
+            current_turns = session.conversationData.test.turns;
+        }
+        var test = session.conversationData.test = {
+            type: 'custom',
+            level: null,
+            count: null, // total number of questions the user wants to do.
+            questions_picked: {},
+            current_question_index: 0,
+            turns: current_turns,
+            num_questions: 0,
+            score: 0
+        };
+
+
+
+        session.dialogData.test = test;  // TODO: Not using dialogdata anymore
+
+
 
 
         /**
