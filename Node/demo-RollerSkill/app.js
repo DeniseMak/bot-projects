@@ -90,39 +90,13 @@ server.post('/api/messages', connector.listen());
 var bot = new builder.UniversalBot(connector, function (session) {
     
         // set up global data
-        session.conversationData.questions = [
-            // Questions for those over 65 who have lived in the states for over 20 years.
-            { question: 'Who was the first President?', answer: '(George) Washington', qId: 18 },
-            { question: 'What was one important thing that Abraham Lincoln did?', answer: 'freed the slaves (Emancipation Proclamation), saved (or preserved) the Union, led the United States during the Civil War', qId: 19 }, 
-            { question: 'What did Martin Luther King, Jr. do?', answer: 'He fought for civil rights and worked for equality for all Americans', qId: 5 },
-            { question: 'What is the capital of the United States?', answer: 'Washington, D.C.', qId: 1 },
-            { question: 'Where is the Statue of Liberty?', answer: 'New York (Harbor) or Liberty Island', qId: 2 },
-            { question: 'Why does the flag have 50 stars?', answer: 'because there are 50 states', qId: 3 },  // often misheard as 450
-            { question: 'When do we celebrate Independence Day?', answer: 'July 4', qId: 4 },
-            //{ question: 'What did Martin Luther King, Jr. do?', answer: 'He fought for civil rights and worked for equality for all Americans', qId: 5 }, // Intent recognizer
-            { question: 'What is one right or freedom from the First Amendment?', answer: 'Any of: speech, religion, assembly, press, petition the government', qId: 6 },
-            { question: 'What is the economic system in the United States?', answer: 'Either of: capitalist economy, market economy', qId: 7 },
-            { question: 'Name one branch or part of the government.', answer: 'Any of: Congress, legislative, President, executive, the courts, judicial', qId: 8 },
-            { question: 'What are the two parts of the U.S. Congress?', answer: 'the Senate and House (of Representatives)', qId: 9 },
-            { question: 'Who is one of your state’s U.S. Senators now?', answer: 'varies depending on your state. See https://en.wikipedia.org/wiki/List_of_current_United_States_Senators', qId: 10 }, // Use list entity recognizer
-            { question: 'In what month do we vote for President?', answer: 'November', qId: 11 },
-            { question: 'What is the name of the President of the United States now?', answer: 'Any of: Donald J. Trump, Donald Trump, Trump', qId: 12 },
-            { question: 'What is the capital of your state?', answer: '', qId: 13 }, // Use list entity recognizer
-            { question: 'What are the two major political parties in the United States?', answer: 'Democratic and Republican', qId: 14 },
-            { question: 'What is one responsibility that is only for United States citizens?', answer: 'serve on a jury, or vote in a federal election', qId: 15 },
-            { question: 'How old do citizens have to be to vote for President?', answer: 'eighteen (18) and older', qId: 16 },
-            { question: 'When is the last day you can send in federal income tax forms?', answer: 'April 15', qId: 17 },
-            // { question: 'Who was the first President?', answer: '(George) Washington', qId: 18 },
-            //{ question: 'What was one important thing that Abraham Lincoln did?', answer: 'freed the slaves (Emancipation Proclamation), saved (or preserved) the Union, led the United States during the Civil War', qId: 19 }, // Use Intent recognizer
-            { question: ' Name one war fought by the United States in the 1900s.', answer: 'World War I, World War II, Korean War, Vietnam War, (Persian) Gulf War', qId: 20 },  // List entity or phrase list
-            { question: 'What did Martin Luther King, Jr. do?', answer: 'fought for civil rights, worked for equality for all Americans', qId: 21 }  // Intent recognizer
-            /* { question: 'What does the President’s Cabinet do?', answer: 'advises the President', qId: 35 },
-            { question: 'What are two cabinet-level positions', answer: 'Secretary of State, Secretary of Labor', qId: 36 }
-            */
-            // --- begin slightly harder questions
-
-        ];
-    session.conversationData.turns = 0;
+    /**
+     * if we set conversation data here, it won't persist 
+     * to the dialog that uses it. and 
+     */
+    // BUGBUG -- because did not call bot.set yet, it doesn't make sense to do anything with session.conversationData below, because it will be lost.
+    // Workaround -- make this privateConversationData.
+    session.privateConversationData.turns = 0;
     // Just redirect to our 'HelpDialog'.
     session.replaceDialog('HelpDialog');
 });
@@ -154,10 +128,10 @@ bot.dialog('CreateTestDialog', [
         var debug_flag = 0;
 
         var current_turns = 0;
-        if (session.conversationData.test !== undefined && session.conversationData.test.turns !== undefined) {
-            current_turns = session.conversationData.test.turns;
+        if (session.privateConversationData.test !== undefined && session.privateConversationData.test.turns !== undefined) {
+            current_turns = session.privateConversationData.test.turns;
         }
-        var test = session.conversationData.test = {
+        var test = session.privateConversationData.test = {
             type: 'custom',
             level: null,
             count: null, // total number of questions the user wants to do.
@@ -168,7 +142,38 @@ bot.dialog('CreateTestDialog', [
             score: 0
         };
 
+        session.privateConversationData.questions = [
+            // Questions for those over 65 who have lived in the states for over 20 years.
+            { question: 'Who was the first President?', answer: '(George) Washington', qId: 18 },
+            { question: 'What was one important thing that Abraham Lincoln did?', answer: 'freed the slaves (Emancipation Proclamation), saved (or preserved) the Union, led the United States during the Civil War', qId: 19 }, 
+            { question: 'What did Martin Luther King, Jr. do?', answer: 'He fought for civil rights and worked for equality for all Americans', qId: 5 },
+            { question: 'What is the capital of the United States?', answer: 'Washington, D.C.', qId: 1 },
+            { question: 'Where is the Statue of Liberty?', answer: 'New York (Harbor) or Liberty Island', qId: 2 },
+            { question: 'Why does the flag have 50 stars?', answer: 'because there are 50 states', qId: 3 },  // often misheard as 450
+            { question: 'When do we celebrate Independence Day?', answer: 'July 4', qId: 4 },
+            //{ question: 'What did Martin Luther King, Jr. do?', answer: 'He fought for civil rights and worked for equality for all Americans', qId: 5 }, // Intent recognizer
+            { question: 'What is one right or freedom from the First Amendment?', answer: 'Any of: speech, religion, assembly, press, petition the government', qId: 6 },
+            { question: 'What is the economic system in the United States?', answer: 'Either of: capitalist economy, market economy', qId: 7 },
+            { question: 'Name one branch or part of the government.', answer: 'Any of: Congress, legislative, President, executive, the courts, judicial', qId: 8 },
+            { question: 'What are the two parts of the U.S. Congress?', answer: 'the Senate and House (of Representatives)', qId: 9 },
+            { question: 'Who is one of your state’s U.S. Senators now?', answer: 'varies depending on your state. See https://en.wikipedia.org/wiki/List_of_current_United_States_Senators', qId: 10 }, // Use list entity recognizer
+            { question: 'In what month do we vote for President?', answer: 'November', qId: 11 },
+            { question: 'What is the name of the President of the United States now?', answer: 'Any of: Donald J. Trump, Donald Trump, Trump', qId: 12 },
+            { question: 'What is the capital of your state?', answer: '', qId: 13 }, // Use list entity recognizer
+            { question: 'What are the two major political parties in the United States?', answer: 'Democratic and Republican', qId: 14 },
+            { question: 'What is one responsibility that is only for United States citizens?', answer: 'serve on a jury, or vote in a federal election', qId: 15 },
+            { question: 'How old do citizens have to be to vote for President?', answer: 'eighteen (18) and older', qId: 16 },
+            { question: 'When is the last day you can send in federal income tax forms?', answer: 'April 15', qId: 17 },
+            // { question: 'Who was the first President?', answer: '(George) Washington', qId: 18 },
+            //{ question: 'What was one important thing that Abraham Lincoln did?', answer: 'freed the slaves (Emancipation Proclamation), saved (or preserved) the Union, led the United States during the Civil War', qId: 19 }, // Use Intent recognizer
+            { question: ' Name one war fought by the United States in the 1900s.', answer: 'World War I, World War II, Korean War, Vietnam War, (Persian) Gulf War', qId: 20 },  // List entity or phrase list
+            { question: 'What did Martin Luther King, Jr. do?', answer: 'fought for civil rights, worked for equality for all Americans', qId: 21 }  // Intent recognizer
+            /* { question: 'What does the President’s Cabinet do?', answer: 'advises the President', qId: 35 },
+            { question: 'What are two cabinet-level positions', answer: 'Secretary of State, Secretary of Labor', qId: 36 }
+            */
+            // --- begin slightly harder questions
 
+        ];
 
         session.dialogData.test = test;  // TODO: Not using dialogdata anymore
 
@@ -179,7 +184,7 @@ bot.dialog('CreateTestDialog', [
          * shuffle the questions
          */
         if (shuffle_on) {
-            session.conversationData.questions = shuffle(session.conversationData.questions);
+            session.privateConversationData.questions = shuffle(session.privateConversationData.questions);
         }
 
 
@@ -218,7 +223,7 @@ bot.dialog('CreateTestDialog', [
         // - The response comes back as a find result with index & entity value matched.
         var test = session.dialogData.test;
         test.level = results.response.entity;  // Question - does this entity have to do with my LUIS model?
-        session.conversationData.test = test;
+        session.privateConversationData.test = test;
         /**
          * Ask for number of questions to ask.
          * 
@@ -249,7 +254,7 @@ bot.dialog('CreateTestDialog', [
         // - The response is already a number.
         var test = session.dialogData.test;
         test.count = results.response;
-        // session.conversationData.test.count = test.count;
+        // session.privateConversationData.test.count = test.count;
         /**
          * Start the quiz we just initialized.
          * 
@@ -259,9 +264,9 @@ bot.dialog('CreateTestDialog', [
          */
         // session.replaceDialog('TakeTestDialog', { test: test });
         test.turns++;
-        session.conversationData.turns++;
+        session.privateConversationData.turns++;
         test.current_question_index = 0;
-        session.conversationData.test = test;
+        session.privateConversationData.test = test;
         session.replaceDialog('AskQuestionDialog', { test: test });
     }
 ]).triggerAction({
@@ -290,15 +295,15 @@ bot.dialog('AskQuestionDialog', [
         var debug = 0;
         var current_question_index = 0;
         var test_question = 'used for debugging only';
-        var score = session.conversationData.test.score;
+        var score = session.privateConversationData.test.score;
 
         /**
          * TODO: Handle the case in which a user says Next but is not inside a test.
          */
-        if (session.conversationData.questions == undefined || session.conversationData.questions == null) {
+        if (session.privateConversationData.questions == undefined || session.privateConversationData.questions == null) {
             // SHOULDN'T BE INSIDE THIS IF
             console.log('AskQuestionDialog: conversationData.questions was undef or null.')
-            session.conversationData.questions = [
+            session.privateConversationData.questions = [
                 // Questions for those over 65 who have lived in the states for over 20 years.
                 { question: 'What is the capital of the United States?', answer: 'Washington, D.C.', qId: 1 },
                 { question: 'Where is the Statue of Liberty?', answer: 'New York (Harbor) or Liberty Island', qId: 2 },
@@ -330,8 +335,8 @@ bot.dialog('AskQuestionDialog', [
         }
 
         try {
-            current_question_index = session.conversationData.test.current_question_index;
-            test_question = sprintf('Got into Ask Question dialog and first question is: %s', session.conversationData.questions[current_question_index].question);
+            current_question_index = session.privateConversationData.test.current_question_index;
+            test_question = sprintf('Got into Ask Question dialog and first question is: %s', session.privateConversationData.questions[current_question_index].question);
         } catch (error) {
             var message = error.message
             var stack = error.stack;
@@ -344,9 +349,9 @@ bot.dialog('AskQuestionDialog', [
         }
         // get our current index into the question list.
 
-        if (current_question_index < session.conversationData.test.count) {
-            var question = session.conversationData.questions[current_question_index].question;  // TODO: handle undefined question
-            var qId = session.conversationData.questions[current_question_index].qId;
+        if (current_question_index < session.privateConversationData.test.count) {
+            var question = session.privateConversationData.questions[current_question_index].question;  // TODO: handle undefined question
+            var qId = session.privateConversationData.questions[current_question_index].qId;
             session.dialogData.qId = qId;
             var dbg_question = 'debug: ' + question;
             console.log('*******\nQuestion #%d is %s. \n*****\n', current_question_index, question);
@@ -367,17 +372,17 @@ bot.dialog('AskQuestionDialog', [
              *   */
             console.log('Index is %d, about to finish', current_question_index);
             var demo = 1;
-            var count = session.conversationData.test.count;
+            var count = session.privateConversationData.test.count;
             if (demo) {
                 // TODO: if (easy) {}
-                var strScore = sprintf('Your score is %f out of %d', session.conversationData.test.score, count);
+                var strScore = sprintf('Your score is %f out of %d', session.privateConversationData.test.score, count);
                 session.say(strScore, strScore);
                 // TODO: else {}
             }
 
 
             // TODO: Display score.
-            session.replaceDialog('HelpDialog', { test: session.conversationData.test, msg: 'Do you want another test?' });
+            session.replaceDialog('HelpDialog', { test: session.privateConversationData.test, msg: 'Do you want another test?' });
         }
     },
     function (session, results) {
@@ -392,7 +397,7 @@ bot.dialog('AskQuestionDialog', [
         var curr_q_score = judgeAnswer(qId, lastUtterance);
 
         // update total score
-        session.conversationData.test.score += curr_q_score;
+        session.privateConversationData.test.score += curr_q_score;
 
         if (curr_q_score > .6) {
             goodOKBad = 'Good answer';
@@ -405,7 +410,7 @@ bot.dialog('AskQuestionDialog', [
 
         var nextTip = ' * Click or say Next for the next question.';
 
-        var officialAnswer = session.conversationData.questions[session.conversationData.test.current_question_index].answer;
+        var officialAnswer = session.privateConversationData.questions[session.privateConversationData.test.current_question_index].answer;
         var txtOfficialAnswer = sprintf('The official answer is: %s', officialAnswer);
         txtOfficialAnswer = txtOfficialAnswer + nextTip;
 
@@ -440,7 +445,7 @@ bot.dialog('AskQuestionDialog', [
         // is ignoringInput the problem?
         msg.inputHint(builder.InputHint.expectingInput);
 
-        session.conversationData.test.current_question_index++; // increment count if we got a recognized result.
+        session.privateConversationData.test.current_question_index++; // increment count if we got a recognized result.
         session.send(msg).endDialog(); //.endDialog(); 
         /************* END CARD */
 
@@ -474,12 +479,12 @@ bot.dialog('HelpDialog', function (session) {
     // var help_ssml = '';
     if (demo) {
         help_title = 'Test Options';
-        // session.conversationData.test.turns
+        // session.privateConversationData.test.turns
     } else {
         help_title = 'help_title';
     }
 
-    if (session.conversationData.turns = 0) {
+    if (session.privateConversationData.turns = 0) {
         help_ssml = 'help_ssml_start';
     } else {
         help_ssml = 'help_ssml';
