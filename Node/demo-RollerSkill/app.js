@@ -140,6 +140,7 @@ bot.dialog('CreateTestDialog', [
         /* TODO: MOVE TO DEFAULT DIALOG */
         session.conversationData.questions = [
             // Questions for those over 65 who have lived in the states for over 20 years.
+            { question: 'Who was the first President?', answer: '(George) Washington', qId: 18 },
             { question: 'What was one important thing that Abraham Lincoln did?', answer: 'freed the slaves (Emancipation Proclamation), saved (or preserved) the Union, led the United States during the Civil War', qId: 19 }, 
             { question: 'What did Martin Luther King, Jr. do?', answer: 'He fought for civil rights and worked for equality for all Americans', qId: 5 },
             { question: 'What is the capital of the United States?', answer: 'Washington, D.C.', qId: 1 },
@@ -159,7 +160,7 @@ bot.dialog('CreateTestDialog', [
             { question: 'What is one responsibility that is only for United States citizens?', answer: 'serve on a jury, or vote in a federal election', qId: 15 },
             { question: 'How old do citizens have to be to vote for President?', answer: 'eighteen (18) and older', qId: 16 },
             { question: 'When is the last day you can send in federal income tax forms?', answer: 'April 15', qId: 17 },
-            { question: 'Who was the first President?', answer: '(George) Washington', qId: 18 },
+            // { question: 'Who was the first President?', answer: '(George) Washington', qId: 18 },
             //{ question: 'What was one important thing that Abraham Lincoln did?', answer: 'freed the slaves (Emancipation Proclamation), saved (or preserved) the Union, led the United States during the Civil War', qId: 19 }, // Use Intent recognizer
             { question: ' Name one war fought by the United States in the 1900s.', answer: 'World War I, World War II, Korean War, Vietnam War, (Persian) Gulf War', qId: 20 },  // List entity or phrase list
             { question: 'What did Martin Luther King, Jr. do?', answer: 'fought for civil rights, worked for equality for all Americans', qId: 21 }  // Intent recognizer
