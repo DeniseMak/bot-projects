@@ -1,0 +1,29 @@
+{
+    "choose_level": "__Difficulty Level__",
+    "choose_level_ssml": [
+        "Do you want easy questions, or harder ones?"
+    ],
+   "choose_count_questions": "How many %s questions should I ask?",
+    "choose_count_questions_ssml": [
+        "How many questions? Choose a number from 1 to ten."
+    ],
+    "card_subtitle_singular_questions": "of the %(level) questions",
+    "card_subtitle_plural_questions": "chose %(count) %(level) questions",
+    "choose_sides": "__Number of Sides__",
+    "choose_count": "How many %d questions should I ask?",
+    "choose_count_ssml": [
+        "How many questions? Choose a number from 1 to ten.",
+        "How many questions?"
+    ],
+    "card_title": "Starting Test",
+    "card_subtitle_singular": "About to ask you a %(level)s question.",
+    "card_subtitle_plural": "About to ask you %(count)d %(level)s questions.",
+    "start_custom_game_ssml": [
+        "Lets do this!",
+        "Here we go.",
+        "Are you ready for this?"
+    ],
+    "help_title": "Take a test",
+    "help_ssml_start": "I can give you quiz questions from the US citizenship exam. You can say 'take a test'.",
+    "help_ssml": "Say or click New Test to take another test. Say goodbye to quit."
+}

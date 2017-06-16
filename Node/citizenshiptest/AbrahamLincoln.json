@@ -1,0 +1,653 @@
+{
+  "luis_schema_version": "2.1.0",
+  "versionId": "0.1A",
+  "name": "AbrahamLincoln",
+  "desc": "Differentiate between correct and incorrect answers to Lincoln question on US Citizenship exam. Correct: 'freed the slaves (Emancipation Proclamation), saved (or preserved) the Union, led the United States during the Civil War'",
+  "culture": "en-us",
+  "intents": [
+    {
+      "name": "CorrectAnswer"
+    },
+    {
+      "name": "None"
+    },
+    {
+      "name": "Utilities.Help",
+      "inherits": {
+        "domain_name": "Utilities",
+        "model_name": "Help"
+      }
+    },
+    {
+      "name": "Utilities.Repeat",
+      "inherits": {
+        "domain_name": "Utilities",
+        "model_name": "Repeat"
+      }
+    },
+    {
+      "name": "Utilities.ShowNext",
+      "inherits": {
+        "domain_name": "Utilities",
+        "model_name": "ShowNext"
+      }
+    },
+    {
+      "name": "Utilities.StartOver",
+      "inherits": {
+        "domain_name": "Utilities",
+        "model_name": "StartOver"
+      }
+    },
+    {
+      "name": "Utilities.Stop",
+      "inherits": {
+        "domain_name": "Utilities",
+        "model_name": "Stop"
+      }
+    },
+    {
+      "name": "WrongAnswer"
+    }
+  ],
+  "entities": [
+    {
+      "name": "LincolnKeyword"
+    }
+  ],
+  "composites": [],
+  "closedLists": [
+    {
+      "name": "LincolnKeywordsList",
+      "subLists": [
+        {
+          "canonicalForm": "emancipation proclamation",
+          "list": [
+            "emancipation proclamation"
+          ]
+        },
+        {
+          "canonicalForm": "saved the union",
+          "list": [
+            "saved the union, preserved the union"
+          ]
+        },
+        {
+          "canonicalForm": "civil war",
+          "list": [
+            "civil war, the civil war"
+          ]
+        }
+      ]
+    }
+  ],
+  "bing_entities": [],
+  "actions": [],
+  "model_features": [
+    {
+      "name": "abolish",
+      "mode": true,
+      "words": "abolish,abolished,abolishing,end,prohibit,put an end to,ended,got rid of",
+      "activated": true
+    },
+    {
+      "name": "free",
+      "mode": true,
+      "words": "free,liberate,emancipate,emancipated,liberated,emancipating,emancipation,set free,release,let go,freed,gave freedom,freedom",
+      "activated": true
+    }
+  ],
+  "regex_features": [],
+  "utterances": [
+    {
+      "text": "slave owner",
+      "intent": "WrongAnswer",
+      "entities": []
+    },
+    {
+      "text": "did something to do with slaves",
+      "intent": "WrongAnswer",
+      "entities": []
+    },
+    {
+      "text": "enjoyed slavery",
+      "intent": "WrongAnswer",
+      "entities": []
+    },
+    {
+      "text": "kept slaves around",
+      "intent": "WrongAnswer",
+      "entities": []
+    },
+    {
+      "text": "had slaves",
+      "intent": "WrongAnswer",
+      "entities": []
+    },
+    {
+      "text": "started the library system",
+      "intent": "WrongAnswer",
+      "entities": []
+    },
+    {
+      "text": "wrote the constitution",
+      "intent": "WrongAnswer",
+      "entities": []
+    },
+    {
+      "text": "the first president",
+      "intent": "WrongAnswer",
+      "entities": []
+    },
+    {
+      "text": "end racial discrimination",
+      "intent": "WrongAnswer",
+      "entities": []
+    },
+    {
+      "text": "worked for equality for all americans",
+      "intent": "WrongAnswer",
+      "entities": []
+    },
+    {
+      "text": "he was a president",
+      "intent": "WrongAnswer",
+      "entities": []
+    },
+    {
+      "text": "carry a gun",
+      "intent": "WrongAnswer",
+      "entities": []
+    },
+    {
+      "text": "women's rights",
+      "intent": "WrongAnswer",
+      "entities": []
+    },
+    {
+      "text": "fought for civil rights",
+      "intent": "WrongAnswer",
+      "entities": []
+    },
+    {
+      "text": "i don't know",
+      "intent": "WrongAnswer",
+      "entities": []
+    },
+    {
+      "text": "put slavery to an end",
+      "intent": "CorrectAnswer",
+      "entities": [
+        {
+          "entity": "LincolnKeyword",
+          "startPos": 4,
+          "endPos": 10
+        }
+      ]
+    },
+    {
+      "text": "kept the union together",
+      "intent": "CorrectAnswer",
+      "entities": [
+        {
+          "entity": "LincolnKeyword",
+          "startPos": 9,
+          "endPos": 13
+        }
+      ]
+    },
+    {
+      "text": "emancipation of slaves",
+      "intent": "CorrectAnswer",
+      "entities": [
+        {
+          "entity": "LincolnKeyword",
+          "startPos": 0,
+          "endPos": 11
+        },
+        {
+          "entity": "LincolnKeyword",
+          "startPos": 16,
+          "endPos": 21
+        }
+      ]
+    },
+    {
+      "text": "abolished the institution of slavery in the us",
+      "intent": "CorrectAnswer",
+      "entities": [
+        {
+          "entity": "LincolnKeyword",
+          "startPos": 29,
+          "endPos": 35
+        }
+      ]
+    },
+    {
+      "text": "ended slavery",
+      "intent": "CorrectAnswer",
+      "entities": [
+        {
+          "entity": "LincolnKeyword",
+          "startPos": 6,
+          "endPos": 12
+        }
+      ]
+    },
+    {
+      "text": "gave the gettysburg address",
+      "intent": "CorrectAnswer",
+      "entities": [
+        {
+          "entity": "LincolnKeyword",
+          "startPos": 9,
+          "endPos": 26
+        }
+      ]
+    },
+    {
+      "text": "'freed the slaves (emancipation proclamation), saved (or preserved) the union, led the united states during the civil war'",
+      "intent": "CorrectAnswer",
+      "entities": [
+        {
+          "entity": "LincolnKeyword",
+          "startPos": 112,
+          "endPos": 120
+        }
+      ]
+    },
+    {
+      "text": "he freed slaves",
+      "intent": "CorrectAnswer",
+      "entities": [
+        {
+          "entity": "LincolnKeyword",
+          "startPos": 9,
+          "endPos": 14
+        }
+      ]
+    },
+    {
+      "text": "free the slaves",
+      "intent": "CorrectAnswer",
+      "entities": [
+        {
+          "entity": "LincolnKeyword",
+          "startPos": 9,
+          "endPos": 14
+        }
+      ]
+    },
+    {
+      "text": "emancipation proclamation",
+      "intent": "CorrectAnswer",
+      "entities": [
+        {
+          "entity": "LincolnKeyword",
+          "startPos": 0,
+          "endPos": 24
+        }
+      ]
+    },
+    {
+      "text": "saved the union",
+      "intent": "CorrectAnswer",
+      "entities": [
+        {
+          "entity": "LincolnKeyword",
+          "startPos": 6,
+          "endPos": 14
+        }
+      ]
+    },
+    {
+      "text": "preserved the union",
+      "intent": "CorrectAnswer",
+      "entities": [
+        {
+          "entity": "LincolnKeyword",
+          "startPos": 10,
+          "endPos": 18
+        }
+      ]
+    },
+    {
+      "text": "led the united states during the civil war",
+      "intent": "CorrectAnswer",
+      "entities": [
+        {
+          "entity": "LincolnKeyword",
+          "startPos": 33,
+          "endPos": 41
+        }
+      ]
+    },
+    {
+      "text": "he was president during the civil war",
+      "intent": "CorrectAnswer",
+      "entities": [
+        {
+          "entity": "LincolnKeyword",
+          "startPos": 28,
+          "endPos": 36
+        }
+      ]
+    },
+    {
+      "text": "issued the emancipation proclamation",
+      "intent": "CorrectAnswer",
+      "entities": [
+        {
+          "entity": "LincolnKeyword",
+          "startPos": 11,
+          "endPos": 35
+        }
+      ]
+    },
+    {
+      "text": "please show previous .",
+      "intent": "None",
+      "entities": []
+    },
+    {
+      "text": "Go back .",
+      "intent": "None",
+      "entities": []
+    },
+    {
+      "text": "Display the previous for me",
+      "intent": "None",
+      "entities": []
+    },
+    {
+      "text": "If you would please turn to previous",
+      "intent": "None",
+      "entities": []
+    },
+    {
+      "text": "i need to go back",
+      "intent": "None",
+      "entities": []
+    },
+    {
+      "text": "go back to amazon",
+      "intent": "None",
+      "entities": []
+    },
+    {
+      "text": "go back to my contacts",
+      "intent": "None",
+      "entities": []
+    },
+    {
+      "text": "Never mind go back",
+      "intent": "None",
+      "entities": []
+    },
+    {
+      "text": "go back on music player",
+      "intent": "None",
+      "entities": []
+    },
+    {
+      "text": "Go back to google please",
+      "intent": "None",
+      "entities": []
+    },
+    {
+      "text": "go back to the beginning",
+      "intent": "None",
+      "entities": []
+    },
+    {
+      "text": "go back",
+      "intent": "None",
+      "entities": []
+    },
+    {
+      "text": "repeat again",
+      "intent": "Utilities.Repeat",
+      "entities": []
+    },
+    {
+      "text": "repeat 10 times .",
+      "intent": "Utilities.Repeat",
+      "entities": []
+    },
+    {
+      "text": "repeat that please",
+      "intent": "Utilities.Repeat",
+      "entities": []
+    },
+    {
+      "text": "repeat start time",
+      "intent": "Utilities.Repeat",
+      "entities": []
+    },
+    {
+      "text": "repeat last question please",
+      "intent": "Utilities.Repeat",
+      "entities": []
+    },
+    {
+      "text": "repeat my name three times",
+      "intent": "Utilities.Repeat",
+      "entities": []
+    },
+    {
+      "text": "repeat selection please",
+      "intent": "Utilities.Repeat",
+      "entities": []
+    },
+    {
+      "text": "repeat it again",
+      "intent": "Utilities.Repeat",
+      "entities": []
+    },
+    {
+      "text": "repeat again please",
+      "intent": "Utilities.Repeat",
+      "entities": []
+    },
+    {
+      "text": "repeat that last joke",
+      "intent": "Utilities.Repeat",
+      "entities": []
+    },
+    {
+      "text": "can just be quiet you ' re giving me a headache",
+      "intent": "Utilities.Stop",
+      "entities": []
+    },
+    {
+      "text": "shut up",
+      "intent": "Utilities.Stop",
+      "entities": []
+    },
+    {
+      "text": "stop please",
+      "intent": "Utilities.Stop",
+      "entities": []
+    },
+    {
+      "text": "Quit help",
+      "intent": "Utilities.Stop",
+      "entities": []
+    },
+    {
+      "text": "stop listening",
+      "intent": "Utilities.Stop",
+      "entities": []
+    },
+    {
+      "text": "i don ' t want that . go back home",
+      "intent": "Utilities.Stop",
+      "entities": []
+    },
+    {
+      "text": "stop it you are really annoying",
+      "intent": "Utilities.Stop",
+      "entities": []
+    },
+    {
+      "text": "Stop saying that please",
+      "intent": "Utilities.Stop",
+      "entities": []
+    },
+    {
+      "text": "phone be quiet for 5 minutes .",
+      "intent": "Utilities.Stop",
+      "entities": []
+    },
+    {
+      "text": "Shut up .",
+      "intent": "Utilities.Stop",
+      "entities": []
+    },
+    {
+      "text": "show me the next please",
+      "intent": "Utilities.ShowNext",
+      "entities": []
+    },
+    {
+      "text": "Go Next",
+      "intent": "Utilities.ShowNext",
+      "entities": []
+    },
+    {
+      "text": "can you click next",
+      "intent": "Utilities.ShowNext",
+      "entities": []
+    },
+    {
+      "text": "second one please",
+      "intent": "Utilities.ShowNext",
+      "entities": []
+    },
+    {
+      "text": "Next please",
+      "intent": "Utilities.ShowNext",
+      "entities": []
+    },
+    {
+      "text": "Show the next please",
+      "intent": "Utilities.ShowNext",
+      "entities": []
+    },
+    {
+      "text": "the next please",
+      "intent": "Utilities.ShowNext",
+      "entities": []
+    },
+    {
+      "text": "let me go next please",
+      "intent": "Utilities.ShowNext",
+      "entities": []
+    },
+    {
+      "text": "please go next",
+      "intent": "Utilities.ShowNext",
+      "entities": []
+    },
+    {
+      "text": "show me the next",
+      "intent": "Utilities.ShowNext",
+      "entities": []
+    },
+    {
+      "text": "can you help me here",
+      "intent": "Utilities.Help",
+      "entities": []
+    },
+    {
+      "text": "I need your help",
+      "intent": "Utilities.Help",
+      "entities": []
+    },
+    {
+      "text": "help me to start",
+      "intent": "Utilities.Help",
+      "entities": []
+    },
+    {
+      "text": "help me with this",
+      "intent": "Utilities.Help",
+      "entities": []
+    },
+    {
+      "text": "Can you help me ?",
+      "intent": "Utilities.Help",
+      "entities": []
+    },
+    {
+      "text": "help me to understand more please",
+      "intent": "Utilities.Help",
+      "entities": []
+    },
+    {
+      "text": "help with my device please",
+      "intent": "Utilities.Help",
+      "entities": []
+    },
+    {
+      "text": "help me please",
+      "intent": "Utilities.Help",
+      "entities": []
+    },
+    {
+      "text": "please help me",
+      "intent": "Utilities.Help",
+      "entities": []
+    },
+    {
+      "text": "please help me i want to finish",
+      "intent": "Utilities.Help",
+      "entities": []
+    },
+    {
+      "text": "Please restart the search",
+      "intent": "Utilities.StartOver",
+      "entities": []
+    },
+    {
+      "text": "Let me start it again from scratch",
+      "intent": "Utilities.StartOver",
+      "entities": []
+    },
+    {
+      "text": "Restart please",
+      "intent": "Utilities.StartOver",
+      "entities": []
+    },
+    {
+      "text": "I want to do restart",
+      "intent": "Utilities.StartOver",
+      "entities": []
+    },
+    {
+      "text": "Can you restart for me ?",
+      "intent": "Utilities.StartOver",
+      "entities": []
+    },
+    {
+      "text": "Delete that and start again",
+      "intent": "Utilities.StartOver",
+      "entities": []
+    },
+    {
+      "text": "Please do restarting",
+      "intent": "Utilities.StartOver",
+      "entities": []
+    },
+    {
+      "text": "Let ' s restart",
+      "intent": "Utilities.StartOver",
+      "entities": []
+    },
+    {
+      "text": "I need to begin over and restart",
+      "intent": "Utilities.StartOver",
+      "entities": []
+    }
+  ]
+}
