@@ -16,7 +16,11 @@ if (DEBUG) {
     shuffle_on = 0;
 } 
 
-const INIT_IN_DEFAULT = 0;
+
+// Turning this on will cause a crash if you invoke the bot saying test
+// but if you turn it off, it will work. This is due to how session.privateConversationData won't get set in 
+// a persistent way in the default dialog that makes it accesible in CreateTest if it's called right away.
+const INIT_IN_DEFAULT = 0;  
 const LUISClient = require("./luis_sdk");
 
 const APPID_nav = "13f573e0-8c13-45a3-86a2-b84b1c7b02e3";
